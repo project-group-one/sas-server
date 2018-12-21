@@ -16,13 +16,16 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
+/**
+ * Created by zj on 2018/12/20
+ */
 @Configuration
 @Slf4j
 public class CorsConfiguration {
 
     private static final String ALLOWED_ORIGIN = "*";
     private static final String ALLOWED_METHODS = "OPTIONS, HEAD, GET, PUT, PATCH, POST, DELETE";
-        private static final String ALLOWED_HEADERS = "*";
+    private static final String ALLOWED_HEADERS = "*";
     private static final String MAX_AGE = "3600";
 
     @Bean
