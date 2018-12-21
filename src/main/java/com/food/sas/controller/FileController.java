@@ -26,7 +26,7 @@ import java.util.UUID;
  */
 @Api(tags = "File")
 @RestController
-@RequestMapping("/files")
+@RequestMapping("/api/files")
 public class FileController {
 
     @Value("${file-path}")

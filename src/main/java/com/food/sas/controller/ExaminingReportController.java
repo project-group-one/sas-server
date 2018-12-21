@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Api(tags = "SAS")
 @RestController
-@RequestMapping("/reports")
+@RequestMapping("/api/reports")
 @AllArgsConstructor
 public class ExaminingReportController {
 
