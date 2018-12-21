@@ -11,6 +11,19 @@ spring:
   jpa:
     show-sql: true
     generate-ddl: true
+    naming_strategy: org.hibernate.cfg.EJB3NamingStrategy
+    connection:
+      CharSet: utf8mb4
+      characterEncoding: utf8
+      useUnicode: true
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 5000
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
+
 
 swagger:
   groupName: 'sas-service-api'

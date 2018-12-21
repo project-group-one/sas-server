@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class ExaminingReportService {
 
 
     public Page<ExaminingReport> listExaminingReports(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
         return examiningReportRepository.findAll(pageRequest);
     }
 
@@ -50,6 +51,7 @@ public class ExaminingReportService {
         });
     }
 
+    @Transactional
     public void deleteExaminingReport(List<Long> ids) {
         examiningReportRepository.deleteByIdIn(ids);
     }
