@@ -1,6 +1,7 @@
 package com.food.sas.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
@@ -31,6 +32,7 @@ public class FileController {
     @Value("${file-path}")
     private String filePath;
 
+    @ApiOperation("上传文件")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<String> uploadFile(@RequestPart("file") FilePart filePart) throws IOException {
         Path pathTemp = Paths.get(filePath);
@@ -40,6 +42,7 @@ public class FileController {
         return Mono.just(path.toString());
     }
 
+    @ApiOperation("下载文件")
     @GetMapping
     public Mono<Void> download(@RequestParam("path") String path, ServerHttpResponse response) {
         ZeroCopyHttpOutputMessage zeroCopyResponse = (ZeroCopyHttpOutputMessage) response;

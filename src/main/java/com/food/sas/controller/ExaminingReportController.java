@@ -57,6 +57,7 @@ public class ExaminingReportController {
         return new DetectionResultModel(true, "该报告检测成功！！！");
     }
 
+    @ApiOperation("删除检测报告")
     @DeleteMapping("/{ids}")
     public void deleteExaminingReport(@PathVariable("ids") @ApiParam("id以逗号分隔") List<Long> ids) {
         examiningReportService.deleteExaminingReport(ids);

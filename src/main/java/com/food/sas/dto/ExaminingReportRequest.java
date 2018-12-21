@@ -1,5 +1,6 @@
 package com.food.sas.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,23 +15,19 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ExaminingReportRequest {
 
+    @ApiModelProperty("报告名称")
     private String name;
 
+    @ApiModelProperty("报告路径")
     private String path;
 
-    /**
-     * 检测结果
-     */
+    @ApiModelProperty("检测结果")
     private String examiningResult;
 
-    /**
-     * 检测评价
-     */
+    @ApiModelProperty("检测评价")
     private String evaluation;
 
-    /**
-     * 指标
-     */
+    @ApiModelProperty("指标")
     private String indicator;
 
 }
