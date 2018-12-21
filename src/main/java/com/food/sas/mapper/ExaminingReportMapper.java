@@ -1,7 +1,7 @@
 package com.food.sas.mapper;
 
-import com.food.sas.dto.ExaminingReportRequest;
-import com.food.sas.entity.ExaminingReport;
+import com.food.sas.data.dto.ExaminingReportRequest;
+import com.food.sas.data.entity.ExaminingReport;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

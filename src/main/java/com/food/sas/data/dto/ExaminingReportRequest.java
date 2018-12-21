@@ -1,4 +1,4 @@
-package com.food.sas.dto;
+package com.food.sas.data.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

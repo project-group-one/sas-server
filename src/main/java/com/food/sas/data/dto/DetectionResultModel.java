@@ -1,4 +1,4 @@
-package com.food.sas.dto;
+package com.food.sas.data.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

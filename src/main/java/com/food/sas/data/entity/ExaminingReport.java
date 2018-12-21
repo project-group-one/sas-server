@@ -1,4 +1,4 @@
-package com.food.sas.entity;
+package com.food.sas.data.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,8 +1,8 @@
 package com.food.sas.service;
 
-import com.food.sas.dto.ExaminingReportRequest;
-import com.food.sas.entity.ExaminingReport;
-import com.food.sas.entity.repository.ExaminingReportRepository;
+import com.food.sas.data.dto.ExaminingReportRequest;
+import com.food.sas.data.entity.ExaminingReport;
+import com.food.sas.data.repository.ExaminingReportRepository;
 import com.food.sas.mapper.ExaminingReportMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

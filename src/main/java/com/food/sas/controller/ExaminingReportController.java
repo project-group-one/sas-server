@@ -1,9 +1,9 @@
 package com.food.sas.controller;
 
-import com.food.sas.dto.BaseResult;
-import com.food.sas.dto.DetectionResultModel;
-import com.food.sas.dto.ExaminingReportRequest;
-import com.food.sas.entity.ExaminingReport;
+import com.food.sas.data.dto.BaseResult;
+import com.food.sas.data.dto.DetectionResultModel;
+import com.food.sas.data.dto.ExaminingReportRequest;
+import com.food.sas.data.entity.ExaminingReport;
 import com.food.sas.service.ExaminingReportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

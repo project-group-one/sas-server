@@ -10,7 +10,7 @@ spring:
     password: root
   jpa:
     show-sql: true
-    generate-ddl: false
+    generate-ddl: true
 
 swagger:
   groupName: 'sas-service-api'

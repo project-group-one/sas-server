@@ -1,8 +1,8 @@
-package com.food.sas.entity.repository;
+package com.food.sas.data.repository;
 
 import com.cosium.spring.data.jpa.entity.graph.repository.EntityGraphJpaRepository;
 import com.cosium.spring.data.jpa.entity.graph.repository.EntityGraphQuerydslPredicateExecutor;
-import com.food.sas.entity.ExaminingReport;
+import com.food.sas.data.entity.ExaminingReport;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
