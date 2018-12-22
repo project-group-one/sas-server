@@ -3,27 +3,40 @@ package com.food.sas.service;
 import com.food.sas.data.dto.ExaminingReportRequest;
 import com.food.sas.data.entity.ExaminingReport;
 import com.food.sas.data.repository.ExaminingReportRepository;
+import com.food.sas.data.repository.FileInfoRepository;
 import com.food.sas.mapper.ExaminingReportMapper;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.nio.file.Files.deleteIfExists;
 
 /**
  * Created by zj on 2018/12/21
  */
 @Slf4j
 @Service
-@AllArgsConstructor
 public class ExaminingReportService {
 
-    private final ExaminingReportRepository examiningReportRepository;
+    @Autowired
+    private FileInfoRepository fileInfoRepository;
+    @Autowired
+    private ExaminingReportRepository examiningReportRepository;
+
+    @Value("${file-path}")
+    private String filePath;
 
 
     public Page<ExaminingReport> listExaminingReports(int page, int size) {
@@ -31,7 +44,7 @@ public class ExaminingReportService {
         return examiningReportRepository.findAll(pageRequest);
     }
 
-    public Optional<ExaminingReport> getExaminingReport(Long id){
+    public Optional<ExaminingReport> getExaminingReport(Long id) {
         return examiningReportRepository.findById(id);
     }
 
@@ -57,7 +70,21 @@ public class ExaminingReportService {
 
     @Transactional
     public void deleteExaminingReport(List<Long> ids) {
-        examiningReportRepository.deleteByIdIn(ids);
+        List<ExaminingReport> reports = examiningReportRepository.findByIdIn(ids);
+        examiningReportRepository.deleteAll(reports);
+        List<String> fileNames = reports.stream().map(ExaminingReport::getName).collect(Collectors.toList());
+        deleteFile(fileNames);
+    }
+
+    @Async
+    public void deleteFile(List<String> fileNames) {
+        fileNames.forEach(name -> {
+            try {
+                deleteIfExists(Paths.get(filePath + name));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void detectionReport(Long id, String msg) {

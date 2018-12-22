@@ -27,4 +27,4 @@ swagger:
   groupName: 'sas-service-api'
   basePackage: 'com.food.sas.controller'
 
-file-path: '/Users/temp/'
+file-path: '/usr/local/sas/'
