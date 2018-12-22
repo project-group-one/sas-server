@@ -29,8 +29,8 @@ public class ExaminingReportController {
     @ApiOperation("检测报告列表")
     @GetMapping
     public BaseResult<List<ExaminingReport>> listExaminingReports(@RequestParam(value = "name", required = false) String name,
-                                                                  @RequestParam(value = "page", defaultValue = "1") int page,
-                                                                  @RequestParam(value = "size", defaultValue = "20") int size) {
+                                                                  @RequestParam(value = "current", defaultValue = "1") int page,
+                                                                  @RequestParam(value = "pageSize", defaultValue = "20") int size) {
         Page<ExaminingReport> reportPage = examiningReportService.listExaminingReports(name, page, size);
         return new BaseResult<>(reportPage.getContent(), reportPage);
     }
