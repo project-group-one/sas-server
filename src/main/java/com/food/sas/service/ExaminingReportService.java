@@ -5,9 +5,9 @@ import com.food.sas.data.entity.ExaminingReport;
 import com.food.sas.data.repository.ExaminingReportRepository;
 import com.food.sas.data.repository.FileInfoRepository;
 import com.food.sas.mapper.ExaminingReportMapper;
+import com.food.sas.util.PathUtils;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
@@ -28,16 +28,11 @@ import static java.nio.file.Files.deleteIfExists;
  */
 @Slf4j
 @Service
+@AllArgsConstructor
 public class ExaminingReportService {
 
-    @Autowired
     private FileInfoRepository fileInfoRepository;
-    @Autowired
     private ExaminingReportRepository examiningReportRepository;
-
-    @Value("${file-path}")
-    private String filePath;
-
 
     public Page<ExaminingReport> listExaminingReports(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page - 1, size);
@@ -80,7 +75,7 @@ public class ExaminingReportService {
     public void deleteFile(List<String> fileNames) {
         fileNames.forEach(name -> {
             try {
-                deleteIfExists(Paths.get(filePath + name));
+                deleteIfExists(Paths.get(PathUtils.getPath() + name));
             } catch (IOException e) {
                 e.printStackTrace();
             }

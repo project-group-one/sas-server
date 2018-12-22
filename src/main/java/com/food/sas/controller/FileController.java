@@ -3,11 +3,11 @@ package com.food.sas.controller;
 import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.entity.FileInfo;
 import com.food.sas.data.repository.FileInfoRepository;
+import com.food.sas.util.PathUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.AllArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,18 +34,15 @@ import java.util.Random;
 @Api(tags = "File")
 @RestController
 @RequestMapping("/api/files")
+@AllArgsConstructor
 public class FileController {
 
-    @Autowired
     private FileInfoRepository fileRepository;
-
-    @Value("${file-path}")
-    private String filePath;
 
     @ApiOperation("上传文件")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaseResult uploadFile(@RequestPart("file") FilePart filePart) throws IOException {
-        Path pathTemp = Paths.get(filePath);
+        Path pathTemp = Paths.get(PathUtils.getPath());
         String extension = FilenameUtils.getExtension(filePart.filename());
         Path path = Files.createTempFile(pathTemp, String.valueOf(new Random().nextInt(1000)), "." + extension);
         AsynchronousFileChannel channel = AsynchronousFileChannel.open(path, StandardOpenOption.WRITE);
@@ -59,7 +56,7 @@ public class FileController {
     @GetMapping
     public Mono<Void> download(@RequestParam("path") String path, ServerHttpResponse response) throws UnsupportedEncodingException {
         ZeroCopyHttpOutputMessage zeroCopyResponse = (ZeroCopyHttpOutputMessage) response;
-        File file = Paths.get(filePath + path).toFile();
+        File file = Paths.get(PathUtils.getPath() + path).toFile();
         FileInfo fileInfo = fileRepository.findByPath(file.getName());
         response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(fileInfo.getName(), "UTF-8"));
         response.getHeaders().setContentType(MediaType.APPLICATION_OCTET_STREAM);
