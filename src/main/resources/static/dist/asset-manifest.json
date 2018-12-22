@@ -21,12 +21,12 @@
   "/11.chunk.css": "/11.chunk.css",
   "/11.async.js": "/11.async.js",
   "/index.html": "/index.html",
-  "/icons/icon-128x128.png": "/icons/icon-128x128.png",
   "/icons/icon-192x192.png": "/icons/icon-192x192.png",
-  "/favicon.png": "/favicon.png",
   "/icons/icon-512x512.png": "/icons/icon-512x512.png",
+  "/favicon.png": "/favicon.png",
+  "/icons/icon-128x128.png": "/icons/icon-128x128.png",
   "/manifest.json": "/manifest.json",
   "/pwacompat.min.js": "/pwacompat.min.js",
-  "/precache-manifest.c07b0d72f11e262aea06924dae47c3fc.js": "/precache-manifest.c07b0d72f11e262aea06924dae47c3fc.js",
+  "/precache-manifest.330f5bb53a209820ba3793a5240dce59.js": "/precache-manifest.330f5bb53a209820ba3793a5240dce59.js",
   "/service-worker.js": "/service-worker.js"
 }
