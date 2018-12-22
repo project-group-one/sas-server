@@ -23,5 +23,7 @@ public class FileInfo implements Serializable {
 
     private String path;
 
+    private String prefix;
+
     private String name;
 }

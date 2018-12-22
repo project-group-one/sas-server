@@ -49,7 +49,8 @@ public class FileController {
         AsynchronousFileChannel channel = AsynchronousFileChannel.open(path, StandardOpenOption.WRITE);
         DataBufferUtils.write(filePart.content(), channel, 0).subscribe();
         String url = path.getFileName().toString();
-        fileRepository.save(FileInfo.builder().name(filePart.filename()).path(url).build());
+        String prefix = path.toString().replace(url, "");
+        fileRepository.save(FileInfo.builder().name(filePart.filename()).path(url).prefix(prefix).build());
         return new BaseResult<>(url);
     }
 
@@ -57,8 +58,8 @@ public class FileController {
     @GetMapping
     public Mono<Void> download(@RequestParam("path") String path, ServerHttpResponse response) throws UnsupportedEncodingException {
         ZeroCopyHttpOutputMessage zeroCopyResponse = (ZeroCopyHttpOutputMessage) response;
-        File file = Paths.get(path).toFile();
-        FileInfo fileInfo = fileRepository.findByPath(file.getName());
+        FileInfo fileInfo = fileRepository.findByPath(path);
+        File file = Paths.get(fileInfo.getPrefix() + path).toFile();
         response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(fileInfo.getName(), "UTF-8"));
         response.getHeaders().setContentType(MediaType.APPLICATION_OCTET_STREAM);
         return zeroCopyResponse.writeWith(file, 0, file.length());
