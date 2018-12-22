@@ -5,17 +5,12 @@ spring:
   application:
     name: food-sas-service
   datasource:
-    url: jdbc:mysql://localhost:3306/d_sas?useUnicode=true&connectTimeout=2000&socketTimeout=6000&autoReconnect=true&rewriteBatchedStatements=TRUE
+    url: jdbc:mysql://39.98.172.236:3306/sas?useUnicode=true&connectTimeout=2000&socketTimeout=6000&autoReconnect=true&rewriteBatchedStatements=TRUE
     username: root
-    password: root
+    password: 123456
   jpa:
     show-sql: true
     generate-ddl: true
-    naming_strategy: org.hibernate.cfg.EJB3NamingStrategy
-    connection:
-      CharSet: utf8mb4
-      characterEncoding: utf8
-      useUnicode: true
     properties:
       hibernate:
         jdbc:
@@ -23,6 +18,9 @@ spring:
           batch_versioned_data: true
         order_inserts: true
         order_updates: true
+        naming:
+          physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
 
 swagger:

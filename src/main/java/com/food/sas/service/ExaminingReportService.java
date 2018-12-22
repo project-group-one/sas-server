@@ -31,6 +31,10 @@ public class ExaminingReportService {
         return examiningReportRepository.findAll(pageRequest);
     }
 
+    public Optional<ExaminingReport> getExaminingReport(Long id){
+        return examiningReportRepository.findById(id);
+    }
+
     public void createExaminingReport(ExaminingReportRequest request) {
         ExaminingReport examiningReport = ExaminingReportMapper.MAPPER.toEntity(request);
         examiningReportRepository.save(examiningReport);

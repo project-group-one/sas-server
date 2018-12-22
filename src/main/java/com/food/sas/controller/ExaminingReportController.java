@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by zj on 2018/12/20
@@ -31,6 +32,12 @@ public class ExaminingReportController {
                                                                   @RequestParam(value = "size", defaultValue = "20") int size) {
         Page<ExaminingReport> reportPage = examiningReportService.listExaminingReports(page, size);
         return new BaseResult<>(reportPage.getContent(), reportPage);
+    }
+
+    @ApiOperation("检测报告详情")
+    @GetMapping("/{id}")
+    public Optional<ExaminingReport> getExaminingReport(@PathVariable("id") Long id) {
+        return examiningReportService.getExaminingReport(id);
     }
 
     @ApiOperation("创建检测报告")
