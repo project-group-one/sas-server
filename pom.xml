@@ -21,9 +21,9 @@
             <url>http://maven.aliyun.com/nexus/content/groups/public</url>
         </repository>
         <repository>
-            <id>souban-nexus-repository</id>
-            <name>souban nexus release repository</name>
-            <url>https://maven.souban.io/repository/release/</url>
+            <id>jcenter-snapshots</id>
+            <name>jcenter</name>
+            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
         </repository>
     </repositories>
 
