@@ -75,7 +75,7 @@ public class ExaminingReportService {
     public void deleteFile(List<String> fileNames) {
         fileNames.forEach(name -> {
             try {
-                deleteIfExists(Paths.get(PathUtils.getPath() + name));
+                deleteIfExists(Paths.get(name));
             } catch (IOException e) {
                 e.printStackTrace();
             }

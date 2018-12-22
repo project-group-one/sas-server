@@ -11,7 +11,7 @@ public class PathUtils {
 
     public static String getPath() {
         try {
-            return ResourceUtils.getURL("resources/static/upload/").getPath();
+            return ResourceUtils.getURL("resources/upload/").getPath();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
