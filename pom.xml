@@ -20,6 +20,11 @@
             <name>Nexus aliyun</name>
             <url>http://maven.aliyun.com/nexus/content/groups/public</url>
         </repository>
+        <repository>
+            <id>souban-nexus-snapshots</id>
+            <name>souban nexus snapshots repository</name>
+            <url>https://maven.souban.io/repository/snapshots/</url>
+        </repository>
     </repositories>
 
     <properties>
