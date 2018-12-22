@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,9 +28,10 @@ public class ExaminingReportController {
 
     @ApiOperation("检测报告列表")
     @GetMapping
-    public BaseResult<List<ExaminingReport>> listExaminingReports(@RequestParam(value = "current", defaultValue = "1") int page,
+    public BaseResult<List<ExaminingReport>> listExaminingReports(@RequestParam(value = "name", required = false) String name,
+                                                                  @RequestParam(value = "page", defaultValue = "1") int page,
                                                                   @RequestParam(value = "size", defaultValue = "20") int size) {
-        Page<ExaminingReport> reportPage = examiningReportService.listExaminingReports(page, size);
+        Page<ExaminingReport> reportPage = examiningReportService.listExaminingReports(name, page, size);
         return new BaseResult<>(reportPage.getContent(), reportPage);
     }
 

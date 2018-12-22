@@ -2,10 +2,12 @@ package com.food.sas.service;
 
 import com.food.sas.data.dto.ExaminingReportRequest;
 import com.food.sas.data.entity.ExaminingReport;
+import com.food.sas.data.entity.QExaminingReport;
 import com.food.sas.data.repository.ExaminingReportRepository;
 import com.food.sas.data.repository.FileInfoRepository;
 import com.food.sas.mapper.ExaminingReportMapper;
 import com.food.sas.util.PathUtils;
+import com.querydsl.core.BooleanBuilder;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,9 +36,13 @@ public class ExaminingReportService {
     private FileInfoRepository fileInfoRepository;
     private ExaminingReportRepository examiningReportRepository;
 
-    public Page<ExaminingReport> listExaminingReports(int page, int size) {
+    public Page<ExaminingReport> listExaminingReports(String name, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page - 1, size);
-        return examiningReportRepository.findAll(pageRequest);
+        BooleanBuilder builder = new BooleanBuilder();
+        if (StringUtils.isEmpty(name)) {
+            builder.and(QExaminingReport.examiningReport.name.contains(name));
+        }
+        return examiningReportRepository.findAll(builder, pageRequest);
     }
 
     public Optional<ExaminingReport> getExaminingReport(Long id) {
