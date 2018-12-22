@@ -39,7 +39,7 @@ public class ExaminingReportService {
     public Page<ExaminingReport> listExaminingReports(String name, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page - 1, size);
         BooleanBuilder builder = new BooleanBuilder();
-        if (StringUtils.isEmpty(name)) {
+        if (!StringUtils.isEmpty(name)) {
             builder.and(QExaminingReport.examiningReport.name.contains(name));
         }
         return examiningReportRepository.findAll(builder, pageRequest);
