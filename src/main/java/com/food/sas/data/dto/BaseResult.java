@@ -31,7 +31,7 @@ public class BaseResult<T> {
 
     public BaseResult(T data, Page page) {
         this.data = data;
-        this.pagination = new Pagination(page.getNumber(), page.getSize(), page.getTotalPages());
+        this.pagination = new Pagination(page.getNumber() + 1, page.getSize(), page.getTotalPages());
     }
 
     public BaseResult(T data) {
