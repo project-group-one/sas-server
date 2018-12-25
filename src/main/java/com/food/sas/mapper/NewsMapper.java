@@ -4,8 +4,6 @@ import com.food.sas.data.dto.NewsDTO;
 import com.food.sas.data.entity.News;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
 
@@ -22,5 +20,6 @@ public interface NewsMapper {
     NewsDTO fromEntity(News entity);
 
     List<NewsDTO> fromEntitys(List<News> entitys);
+
 
 }

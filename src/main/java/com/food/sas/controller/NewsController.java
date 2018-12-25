@@ -49,7 +49,7 @@ public class NewsController {
     @GetMapping
     public BaseResult<?> getNewsList(NewsDTO dto, @RequestParam(value = "page", defaultValue = "1") int page,
                                      @RequestParam(value = "size", defaultValue = "20") int size) {
-        Page<NewsDTO> result = newsService.getNewsList(dto, PageRequest.of(page, size));
+        Page<NewsDTO> result = newsService.getNewsList(dto, PageRequest.of(page - 1 < 0 ? 0 : page, size));
         return new BaseResult<List<NewsDTO>>(result.getContent(), result);
     }
 
@@ -72,6 +72,7 @@ public class NewsController {
     public Mono<?> updateNews(@RequestBody NewsDTO body, @PathVariable Integer id) throws IOException {
         Path old = Paths.get(body.getStoreUrl());
         Files.write(old, body.getContent().getBytes());
+        newsService.saveNews(body);
         return Mono.empty();
     }
 

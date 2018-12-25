@@ -30,6 +30,9 @@ public class NewsServiceImpl implements INewsService {
     @Override
     public boolean saveNews(NewsDTO dto) {
         News news = NewsMapper.MAPPER.toEntity(dto);
+        if (StringUtils.isEmpty(news.getStoreUrl())) {
+            return false;
+        }
         return newsRepository.save(news) != null;
     }
 
@@ -59,7 +62,7 @@ public class NewsServiceImpl implements INewsService {
         }
 
         Page<News> page = newsRepository.findAll(builder, pageable);
-        return new PageImpl<>(NewsMapper.MAPPER.fromEntitys(page.getContent()));
+        return new PageImpl<>(NewsMapper.MAPPER.fromEntitys(page.getContent()), pageable, page.getTotalElements());
     }
 
 }

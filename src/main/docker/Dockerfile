@@ -1,6 +1,7 @@
 FROM openjdk:8-jdk-alpine
 VOLUME /tmp
 VOLUME /heap
+        VOLUME /data
 ADD sas.jar app.jar
 RUN sh -c 'touch /app.jar'
 ENV JVM_OPTS="-Xmx2048m"
