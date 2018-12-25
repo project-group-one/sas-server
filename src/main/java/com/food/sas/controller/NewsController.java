@@ -5,25 +5,18 @@ import com.food.sas.data.dto.NewsDTO;
 import com.food.sas.service.INewsService;
 import com.food.sas.util.PathUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousFileChannel;
 import java.nio.file.*;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Future;
 
 /**
  * @author Created by ygdxd_admin at 2018-12-22 2:41 PM
@@ -37,6 +30,7 @@ public class NewsController {
     private INewsService newsService;
 
 
+    @ApiOperation("获得单个新闻内容")
     @GetMapping("/{id}")
     public BaseResult<?> getNewsById(@PathVariable Integer id) throws IOException {
         NewsDTO dto = newsService.getNewsById(id);
@@ -51,6 +45,7 @@ public class NewsController {
         return new BaseResult(dto);
     }
 
+    @ApiOperation("获取新闻资讯列表")
     @GetMapping
     public BaseResult<?> getNewsList(NewsDTO dto, @RequestParam(value = "page", defaultValue = "1") int page,
                                      @RequestParam(value = "size", defaultValue = "20") int size) {
@@ -59,6 +54,7 @@ public class NewsController {
     }
 
 
+    @ApiOperation("新增新闻")
     @PostMapping
     public Mono<?> releaseNews(@RequestBody NewsDTO body) throws IOException {
 //        String html = org.apache.commons.text.StringEscapeUtils.escapeHtml4(body.getContent());
@@ -71,6 +67,7 @@ public class NewsController {
         return Mono.empty();
     }
 
+    @ApiOperation("修改新闻内容")
     @PutMapping("/{id}")
     public Mono<?> updateNews(@RequestBody NewsDTO body, @PathVariable Integer id) throws IOException {
         Path old = Paths.get(body.getStoreUrl());
@@ -78,6 +75,7 @@ public class NewsController {
         return Mono.empty();
     }
 
+    @ApiOperation("删除新闻")
     @DeleteMapping("/{id}")
     public Mono<?> deleteNews(@PathVariable Integer id) throws IOException {
         NewsDTO dto = newsService.getNewsById(id);

@@ -2,11 +2,13 @@ package com.food.sas.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author Created by ygdxd_admin at 2018-12-21 10:16 PM
@@ -21,6 +23,8 @@ public class User implements Serializable {
     @GeneratedValue
     private Integer id;
 
+    private String name;
+
     private String username;
 
     @JsonIgnore
@@ -30,5 +34,10 @@ public class User implements Serializable {
 
     private String address;
 
+    private String phone;
+
     private String role;
+
+    @CreatedDate
+    private Date createDate;
 }
