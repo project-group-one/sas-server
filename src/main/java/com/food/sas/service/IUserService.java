@@ -10,4 +10,16 @@ import org.springframework.data.domain.Pageable;
 public interface IUserService {
 
     Page<UserDTO> getUserPage(UserDTO dto, Pageable pageable);
+
+    boolean createUser(UserDTO dto);
+
+    void modifyManager(UserDTO dto, Integer id);
+
+    boolean validate(Integer id, Integer type);
+
+    boolean validateById(Integer id, Integer mId);
+
+    void batchDeleteUser(Integer[] ids);
+
+    void freezeUser(Integer id);
 }

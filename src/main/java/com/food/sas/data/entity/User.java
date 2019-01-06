@@ -1,6 +1,7 @@
 package com.food.sas.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -30,6 +31,9 @@ public class User implements Serializable {
     @JsonIgnore
     private String password;
 
+    /**
+     * 0 普通用户 1 单位操作员 2 审核员 3 超级管理员
+     */
     private Integer type;
 
     private String address;
@@ -40,4 +44,8 @@ public class User implements Serializable {
 
     @CreatedDate
     private Date createDate;
+
+    private Integer orgizationId;
+
+    private Integer status;
 }

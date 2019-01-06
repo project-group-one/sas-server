@@ -13,4 +13,8 @@ import java.util.List;
 public interface UserMapper {
 
     List<UserDTO> fromEntitys(List<User> entitys);
+
+    UserDTO fromEntity(User user);
+
+    User toEntity(UserDTO dto);
 }

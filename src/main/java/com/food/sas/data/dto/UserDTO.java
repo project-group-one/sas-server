@@ -1,5 +1,7 @@
 package com.food.sas.data.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.food.sas.security.PasswordSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -19,10 +21,13 @@ public class UserDTO implements Serializable {
     @ApiModelProperty("用户名")
     private String username;
 
+    @JsonSerialize(using = PasswordSerializer.class)
+    private String password;
+
     @ApiModelProperty("姓名")
     private String name;
 
-    @ApiModelProperty("类型")
+    @ApiModelProperty("类型 0 普通用户 1 单位操作员 2 审核员")
     private Integer type;
 
     @ApiModelProperty("权限")
@@ -33,4 +38,10 @@ public class UserDTO implements Serializable {
 
     @ApiModelProperty("电话")
     private String phone;
+
+    @ApiModelProperty("状态 0 正常 1 冻结")
+    private Integer status;
+
+    @ApiModelProperty("地址")
+    private String address;
 }
