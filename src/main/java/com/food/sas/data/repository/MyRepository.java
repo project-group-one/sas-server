@@ -14,5 +14,4 @@ import javax.persistence.PersistenceContext;
 @NoRepositoryBean
 public interface MyRepository<T, ID> extends JpaRepository<T, ID>, QuerydslPredicateExecutor<T> {
 
-
 }

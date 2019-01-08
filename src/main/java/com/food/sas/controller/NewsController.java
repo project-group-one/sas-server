@@ -21,7 +21,7 @@ import java.util.UUID;
 /**
  * @author Created by ygdxd_admin at 2018-12-22 2:41 PM
  */
-@Api(tags = "news")
+@Api(tags = "新闻管理")
 @RequestMapping("/news")
 @RestController
 public class NewsController {

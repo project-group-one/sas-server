@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -26,12 +28,18 @@ import java.util.List;
 @Api(tags = "用户管理")
 public class UserController {
 
+    private static final String SALT = "$qiqi";
+
+    private static final String ROLE = "NORMAL";
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     @Autowired
     private IUserService userService;
 
-//    @Autowired
-//    private MyMapReactiveUserDetailsService userDetailsService;
+    @Autowired
+    private MyMapReactiveUserDetailsService userDetailsService;
 
     //    @PreAuthorize("hasRole('ADMIN')")
     @ApiModelProperty("用户列表查询")
@@ -47,11 +55,18 @@ public class UserController {
     @PostMapping
     public Mono<?> registeredUser(@ApiParam(value = "创建用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Integer id, @RequestBody UserDTO dto) {
 
+        dto.setRole(ROLE);
         if (!userService.validate(id, dto.getType())) {
             return Mono.error(new IllegalArgumentException("type is illegal"));
         }
-        if (userService.createUser(dto)) {
-//            userDetailsService.
+        dto.setPassword(SALT + encoder.encode(dto.getPassword()));
+        UserDTO user = userService.createUser(dto);
+        if (user != null) {
+            userDetailsService.addUserDetail(User.builder().passwordEncoder(password -> password.substring(5))
+                    .username(dto.getUsername())
+                    .password(user.getPassword())
+                    .authorities(user.getRole().split(","))
+                    .build());
         }
         return Mono.empty();
     }
@@ -60,7 +75,7 @@ public class UserController {
     @PutMapping("/{mId}")
     public Mono<?> modifyManager(@RequestBody UserDTO dto, @ApiParam("需要修改的用户的id") @PathVariable Integer mId, @ApiParam(value = "修改用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Integer id) {
         if (!userService.validateById(id, mId)) {
-            return Mono.error(new IllegalArgumentException("id is illegal"));
+            return Mono.error(new IllegalArgumentException("no access"));
         }
         if (dto.getType() != null && !userService.validate(id, dto.getType())) {
             return Mono.error(new IllegalArgumentException("type is illegal"));
@@ -73,7 +88,7 @@ public class UserController {
     @PostMapping("/{mId}/freeze")
     public Mono<?> freezeUser(@ApiParam(value = "冻结用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Integer id, @ApiParam("需要冻结的用户id") @PathVariable Integer mId) {
         if (!userService.validateById(id, mId)) {
-            return Mono.error(new IllegalArgumentException("type is illegal"));
+            return Mono.error(new IllegalArgumentException("no access"));
         }
         userService.freezeUser(mId);
         return Mono.empty();
@@ -82,15 +97,24 @@ public class UserController {
 
     @ApiOperation("删除管理员")
     @DeleteMapping
-    public Mono<?> deleteUser(@ApiParam("id以逗号分隔") @RequestParam Integer[] ids, @ApiParam(value = "创建用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Integer id) {
+    public Mono<?> deleteUser(@ApiParam("id以逗号分隔") @RequestParam Integer[] ids, @ApiParam(value = "删除用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Integer id) {
         for (Integer mId : ids) {
             if (!userService.validateById(id, mId)) {
-                return Mono.error(new IllegalArgumentException("type is illegal"));
+                return Mono.error(new IllegalArgumentException("no access"));
             }
         }
         userService.batchDeleteUser(ids);
         return Mono.empty();
     }
 
+    @ApiOperation("修改用户权限")
+    @PutMapping("/{mId}/freeze")
+    public Mono<?> changeRole(@PathVariable Integer mId, @ApiParam(value = "修改用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") Integer id, @ApiParam("1 GUEST 2 NORMAL 4 ADMIN") Integer role) {
+        if (!userService.validateById(id, mId)) {
+            return Mono.error(new IllegalArgumentException("no access"));
+        }
+        userService.changeRole(mId, role);
+        return Mono.empty();
+    }
 
 }

@@ -29,6 +29,14 @@ public class UserServiceImpl implements IUserService {
 
     private static final int FREEZED_STATUS = 1;
 
+    private static final String ROLE_ADMIN = "ADMIN";
+    private static final int ROLE_ADMIN_I = 4;
+    private static final String ROLE_NORMAL = "NORMAL";
+    private static final int ROLE_NORMAL_I = 2;
+    private static final String ROLE_GUEST = "GUEST";
+    private static final int ROLE_GUEST_I = 1;
+    private static final String ROLE_ALL = "ALL";
+
     @Autowired
     private UserRepository userRepository;
 
@@ -54,9 +62,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public boolean createUser(UserDTO dto) {
+    public UserDTO createUser(UserDTO dto) {
+        UserMapper mapper = Mappers.getMapper(UserMapper.class);
         dto.setType(0);
-        return null != userRepository.saveAndFlush(Mappers.getMapper(UserMapper.class).toEntity(dto));
+        return mapper.fromEntity(userRepository.saveAndFlush(mapper.toEntity(dto)));
     }
 
     @Override
@@ -120,5 +129,17 @@ public class UserServiceImpl implements IUserService {
             user.setStatus(FREEZED_STATUS);
             userRepository.saveAndFlush(user);
         });
+    }
+
+    @Override
+    public void changeRole(Integer mId, Integer role) {
+        userRepository.findById(mId).ifPresent(user -> {
+            user.setRole(getRole(role));
+            userRepository.saveAndFlush(user);
+        });
+    }
+
+    private String getRole(int role) {
+        return (role & ROLE_ADMIN_I) == ROLE_ADMIN_I ? ROLE_ADMIN : (role & ROLE_NORMAL_I) == ROLE_NORMAL_I ? ROLE_NORMAL : ROLE_GUEST;
     }
 }
