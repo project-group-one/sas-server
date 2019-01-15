@@ -98,7 +98,7 @@ public class SecurityConfiguration {
                 .authorizeExchange()
                 .pathMatchers("/auth/**").permitAll()
 //                .pathMatchers( "/druid/*").permitAll()
-                .pathMatchers("/swagger**").permitAll()
+                .pathMatchers("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**").permitAll()
                 .anyExchange().authenticated()
                 .and()
                 .csrf().disable().securityContextRepository(repository);

@@ -53,7 +53,7 @@ public class SwaggerUiConfiguration {
                 .select()
                 .apis(StringUtils.isEmpty(swaggerProperties.getBasePackage())
                         ? RequestHandlerSelectors.any()
-                        : RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
+                        : RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()).or(RequestHandlerSelectors.basePackage("com.food.sas.security.endpoint")))
                 .paths(PathSelectors.any())
                 .build()
                 .pathMapping("/")
