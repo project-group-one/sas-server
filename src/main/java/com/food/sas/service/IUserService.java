@@ -12,6 +12,8 @@ public interface IUserService {
 
     Page<UserDTO> getUserPage(UserDTO dto, Pageable pageable);
 
+    UserDTO findUserByUsername(String username);
+
     UserDTO createUser(UserDTO dto);
 
     void modifyManager(UserDTO dto, Integer id);

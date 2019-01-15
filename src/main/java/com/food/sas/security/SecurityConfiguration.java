@@ -2,27 +2,32 @@ package com.food.sas.security;
 
 import com.food.sas.data.entity.QUser;
 import com.food.sas.data.repository.UserRepository;
+import com.food.sas.security.handler.MyRestfulSuccessHandler;
 import com.food.sas.security.service.MyMapReactiveUserDetailsService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.RedirectServerAuthenticationEntryPoint;
-import org.springframework.util.DigestUtils;
-
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.web.server.authentication.DelegatingServerAuthenticationSuccessHandler;
+import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 
 import java.util.List;
 
@@ -36,8 +41,27 @@ import java.util.List;
 @EnableWebFluxSecurity
 public class SecurityConfiguration {
 
+    public static final String KEY = "qiqi";
+
+    public static final MacSigner HMAC = new MacSigner(KEY);
+
+    public static final String AUTH_HEADER = "Authorization";
+
+    public static final String TOKEN_HEAD = "Bearer ";
+
+    //开始
+    private static final String S1 = "#";
+
+    //分隔
+    private static final String S2 = ":";
+
     @Autowired
     private UserRepository repository;
+
+    @Bean
+    public WebSessionServerSecurityContextRepository webSessionServerSecurityContextRepository() {
+        return new WebSessionServerSecurityContextRepository();
+    }
 
     @Bean
     public BCryptPasswordEncoder encoder() {
@@ -45,26 +69,43 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    public ReactiveAuthenticationManager reactiveAuthenticationManager(@Qualifier("userDetailsService") MyMapReactiveUserDetailsService userDetailsServic, BCryptPasswordEncoder encoder) {
+        ReactiveAuthenticationManager reactiveAuthenticationManager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsServic);
+        ((UserDetailsRepositoryReactiveAuthenticationManager) reactiveAuthenticationManager).setPasswordEncoder(encoder);
+        return reactiveAuthenticationManager;
+    }
+
+    @Bean
     public MyMapReactiveUserDetailsService userDetailsService() {
         List<UserDetails> userDetails = Lists.newArrayList();
-        repository.findAll(QUser.user.type.lt(4)).forEach(u -> userDetails.add(User.builder().passwordEncoder(password -> password.substring(5))
-                .username(u.getUsername())
-                .password(u.getPassword())
-                .authorities(u.getRole().split(","))
-                .build()));
-        System.out.println(userDetails);
+        repository.findAll(QUser.user.type.lt(4)).forEach(u -> userDetails.add(
+                new com.food.sas.security.User(u.getId(), u.getType(), u.getUsername(), u.getPassword().substring(5), AuthorityUtils.createAuthorityList(u.getRole().split(",")))
+//                User.builder().passwordEncoder(password -> password.substring(5))
+//                .username(u.getUsername())
+//                .password(u.getPassword())
+//                .authorities(new StringBuffer(u.getRole()).append(",").append(S1).append(u.getId()).append(S2).append(u.getType()).toString().split(","))
+////                .roles(u.getRole().split(","))
+//                .credentialsExpired(true)
+//                .build()
+        ));
         return new MyMapReactiveUserDetailsService(userDetails);
     }
 
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, ReactiveAuthenticationManager reactiveAuthenticationManager, WebSessionServerSecurityContextRepository repository) {
         http
+                .authenticationManager(reactiveAuthenticationManager)
                 .authorizeExchange()
-                .pathMatchers( "/druid/**").permitAll()
+                .pathMatchers("/auth/**").permitAll()
+//                .pathMatchers( "/druid/*").permitAll()
+                .pathMatchers("/swagger**").permitAll()
                 .anyExchange().authenticated()
                 .and()
-                .csrf().disable()
-                .httpBasic().and().formLogin();
+                .csrf().disable().securityContextRepository(repository);
+        MyRestfulSuccessHandler handler = new MyRestfulSuccessHandler();
+        http.formLogin().authenticationSuccessHandler(new DelegatingServerAuthenticationSuccessHandler(handler));
         return http.build();
     }
+
+
 }

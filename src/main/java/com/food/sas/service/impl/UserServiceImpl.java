@@ -62,6 +62,13 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public UserDTO findUserByUsername(String username) {
+        QUser qUser = QUser.user;
+        return Mappers.getMapper(UserMapper.class).fromEntity(userRepository.findOne(qUser.username.eq(username)).get());
+
+    }
+
+    @Override
     public UserDTO createUser(UserDTO dto) {
         UserMapper mapper = Mappers.getMapper(UserMapper.class);
         dto.setType(0);

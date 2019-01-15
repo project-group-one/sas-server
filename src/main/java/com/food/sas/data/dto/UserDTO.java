@@ -18,6 +18,9 @@ public class UserDTO implements Serializable {
 
     private static final long serialVersionUID = 4770202285205940411L;
 
+    @ApiModelProperty("用户id")
+    private Integer id;
+
     @ApiModelProperty("用户名")
     private String username;
 
