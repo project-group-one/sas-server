@@ -16,6 +16,8 @@ public class PasswordSerializer extends JsonSerializer<String> {
 
     @Override
     public void serialize(String s, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        jsonGenerator.writeBinary(new String("****").getBytes());
+//        jsonGenerator.writeBinary(new String("****").getBytes());
+        jsonGenerator.writeObject(new String("****"));
+        jsonGenerator.flush();
     }
 }

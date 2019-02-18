@@ -6,6 +6,7 @@ import com.food.sas.data.entity.User;
 import com.food.sas.data.repository.UserRepository;
 import com.food.sas.mapper.UserMapper;
 import com.food.sas.service.IUserService;
+import com.food.sas.util.BooleanBuilderHelper;
 import com.querydsl.core.BooleanBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.factory.Mappers;
@@ -47,16 +48,12 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Page<UserDTO> getUserPage(UserDTO dto, Pageable pageable) {
         QUser user = QUser.user;
-        BooleanBuilder builder = new BooleanBuilder();
-        if (StringUtils.isNotEmpty(dto.getName())) {
-            builder.and(user.name.like(dto.getName()));
-        }
-        if (StringUtils.isNotEmpty(dto.getPhone())) {
-            builder.and(user.name.like(dto.getPhone()));
-        }
-        if (dto.getType() != null) {
-            builder.and(user.type.eq(dto.getType()));
-        }
+        BooleanBuilder builder = BooleanBuilderHelper.newBuilder().andStringLike(user.name, dto.getName())
+                .andStringLike(user.username, dto.getUsername())
+                .andStringLike(user.address, dto.getAddress(), true)
+                .andIntegerEq(user.type, dto.getType())
+                .build();
+
         Page<User> userPage = userRepository.findAll(builder, pageable);
         return new PageImpl<>(Mappers.getMapper(UserMapper.class).fromEntitys(userPage.getContent()), pageable, userPage.getTotalElements());
     }

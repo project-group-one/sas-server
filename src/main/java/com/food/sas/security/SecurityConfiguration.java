@@ -2,6 +2,8 @@ package com.food.sas.security;
 
 import com.food.sas.data.entity.QUser;
 import com.food.sas.data.repository.UserRepository;
+import com.food.sas.security.filter.MyTokenFilter;
+import com.food.sas.security.handler.MyAuthenticationFailureHandler;
 import com.food.sas.security.handler.MyRestfulSuccessHandler;
 import com.food.sas.security.service.MyMapReactiveUserDetailsService;
 import com.google.common.collect.Lists;
@@ -9,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
@@ -63,6 +67,10 @@ public class SecurityConfiguration {
         return new WebSessionServerSecurityContextRepository();
     }
 
+    private MyAuthenticationFailureHandler authenticationFailureHandler() {
+        return new MyAuthenticationFailureHandler(HttpStatus.FORBIDDEN);
+    }
+
     @Bean
     public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
@@ -92,8 +100,9 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, ReactiveAuthenticationManager reactiveAuthenticationManager, WebSessionServerSecurityContextRepository repository) {
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, ReactiveAuthenticationManager reactiveAuthenticationManager, WebSessionServerSecurityContextRepository repository, MyMapReactiveUserDetailsService userDetailsService) {
         http
+                .addFilterAt(new MyTokenFilter(KEY, HMAC, userDetailsService, repository), SecurityWebFiltersOrder.FIRST)
                 .authenticationManager(reactiveAuthenticationManager)
                 .authorizeExchange()
                 .pathMatchers("/auth/**").permitAll()
@@ -103,7 +112,7 @@ public class SecurityConfiguration {
                 .and()
                 .csrf().disable().securityContextRepository(repository);
         MyRestfulSuccessHandler handler = new MyRestfulSuccessHandler();
-        http.formLogin().authenticationSuccessHandler(new DelegatingServerAuthenticationSuccessHandler(handler));
+        http.formLogin().authenticationSuccessHandler(new DelegatingServerAuthenticationSuccessHandler(handler)).loginPage("/login").authenticationFailureHandler(authenticationFailureHandler()).and().logout().logoutUrl("/signout");
         return http.build();
     }
 

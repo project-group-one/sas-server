@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -41,12 +43,21 @@ public class UserController {
     @Autowired
     private MyMapReactiveUserDetailsService userDetailsService;
 
+    @ApiOperation("登录后调用 获取必要参数")
+    @GetMapping("/current")
+    public Mono<?> getCurrentUser(Authentication authentication) {
+        if (authentication.isAuthenticated()) {
+            return Mono.just(userService.findUserByUsername(authentication.getName()));
+        }
+        return Mono.error(new AccessDeniedException("illegal operation"));
+    }
+
     //    @PreAuthorize("hasRole('ADMIN')")
-    @ApiModelProperty("用户列表查询")
+    @ApiOperation("用户列表查询 查询参数 username(半模糊) address type name(半模糊)")
+    @GetMapping
     public BaseResult<?> getUserPages(UserDTO dto, @RequestParam(value = "page", defaultValue = "1") int page,
                                       @RequestParam(value = "size", defaultValue = "20") int size) {
-//        System.out.println(JSON.toJSONString(authentication.getAuthorities()));
-        Page<UserDTO> result = userService.getUserPage(dto, PageRequest.of(page - 1 < 0 ? 0 : page, size));
+        Page<UserDTO> result = userService.getUserPage(dto, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));
         return new BaseResult<List<UserDTO>>(result.getContent(), result);
     }
 
@@ -116,5 +127,7 @@ public class UserController {
         userService.changeRole(mId, role);
         return Mono.empty();
     }
+
+//    public Mono<?>
 
 }
