@@ -15,22 +15,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.DelegatingServerAuthenticationSuccessHandler;
+import org.springframework.security.web.server.authentication.HttpBasicServerAuthenticationEntryPoint;
+import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 
 import java.util.List;
@@ -112,7 +107,11 @@ public class SecurityConfiguration {
                 .and()
                 .csrf().disable().securityContextRepository(repository);
         MyRestfulSuccessHandler handler = new MyRestfulSuccessHandler();
-        http.formLogin().authenticationSuccessHandler(new DelegatingServerAuthenticationSuccessHandler(handler)).loginPage("/login").authenticationFailureHandler(authenticationFailureHandler()).and().logout().logoutUrl("/signout");
+        http.formLogin().authenticationSuccessHandler(new DelegatingServerAuthenticationSuccessHandler(handler))
+                .loginPage("http://39.98.172.236:9000")
+                .authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.FORBIDDEN))
+                .authenticationFailureHandler(authenticationFailureHandler())
+                .and().logout().logoutUrl("/signout");
         return http.build();
     }
 

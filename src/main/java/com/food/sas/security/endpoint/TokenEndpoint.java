@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * @author Created by ygdxd_admin at 2019-01-14 10:03 PM
@@ -54,32 +55,52 @@ public class TokenEndpoint {
 
     @ApiOperation("获取密钥 其实还是session登录 现在密钥还没卵用， 密码错误会报错")
     @PostMapping("/token")
-    public Mono<?> getToken(@RequestBody UsernamePasswordRequest body, ServerWebExchange exchange) {
+    public Mono<?> getToken(@RequestBody UsernamePasswordRequest body, @ApiIgnore ServerWebExchange exchange) {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(body.getUsername(), body.getPassword());
-        final Mono<Authentication> authentication = reactiveAuthenticationManager.authenticate(token);
-        SecurityContextImpl securityContext = new SecurityContextImpl();
-        authentication.subscribe(authentication1 -> {
+        Mono<Authentication> authentication = reactiveAuthenticationManager.authenticate(token);
+//        SecurityContextImpl securityContext = new SecurityContextImpl();
+//        authentication.subscribe(securityContext::setAuthentication);
+//
+//        if (securityContext.getAuthentication() == null) {
+//            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+//            return Mono.just("用户名或者密码错误");
+//        }
+//        repository.save(exchange, securityContext).then(Mono.empty())
+//                .subscriberContext(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)))
+//                .subscribe();
+
+
+        return authentication.flatMap(authentication1 -> {
+            SecurityContextImpl securityContext = new SecurityContextImpl();
             securityContext.setAuthentication(authentication1);
+            if (securityContext.getAuthentication() == null) {
+                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                return Mono.just("用户名或者密码错误");
+            }
+            repository.save(exchange, securityContext).then(Mono.empty())
+                    .subscriberContext(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)))
+                    .subscribe();
+            return userDetailsService.findByUsername(body.getUsername()).map(userDetails -> {
+                System.out.println(JSON.toJSONString(userDetails));
+                UserDTO userDTO = userService.findUserByUsername(body.getUsername());
+                return JwtBody.newBuiler()
+                        .setAccessToken(JwtHelper.encode(JSON.toJSONString(userDetails), SecurityConfiguration.HMAC).getEncoded())
+                        .setExpired(3600L)
+                        .setRefreshToken(null)
+                        .setUserId(userDTO.getId())
+                        .setUserType(userDTO.getType()).builde();
+            });
         });
-        if (securityContext.getAuthentication() == null) {
-            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-            return Mono.just("用户名或者密码错误");
-        }
-        repository.save(exchange, securityContext).then(Mono.empty())
-                .subscriberContext(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)))
-                .subscribe();
-
-
-        return userDetailsService.findByUsername(body.getUsername()).map(userDetails -> {
-            System.out.println(JSON.toJSONString(userDetails));
-            UserDTO userDTO = userService.findUserByUsername(body.getUsername());
-            return JwtBody.newBuiler()
-                    .setAccessToken(JwtHelper.encode(JSON.toJSONString(userDetails), SecurityConfiguration.HMAC).getEncoded())
-                    .setExpired(3600L)
-                    .setRefreshToken(null)
-                    .setUserId(userDTO.getId())
-                    .setUserType(userDTO.getType()).builde();
-        });
+//        userDetailsService.findByUsername(body.getUsername()).map(userDetails -> {
+//            System.out.println(JSON.toJSONString(userDetails));
+//            UserDTO userDTO = userService.findUserByUsername(body.getUsername());
+//            return JwtBody.newBuiler()
+//                    .setAccessToken(JwtHelper.encode(JSON.toJSONString(userDetails), SecurityConfiguration.HMAC).getEncoded())
+//                    .setExpired(3600L)
+//                    .setRefreshToken(null)
+//                    .setUserId(userDTO.getId())
+//                    .setUserType(userDTO.getType()).builde();
+//        });
 //        return Mono.just(result);
     }
 
