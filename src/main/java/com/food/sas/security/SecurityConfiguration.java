@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
@@ -100,6 +101,7 @@ public class SecurityConfiguration {
                 .addFilterAt(new MyTokenFilter(KEY, HMAC, userDetailsService, repository), SecurityWebFiltersOrder.FIRST)
                 .authenticationManager(reactiveAuthenticationManager)
                 .authorizeExchange()
+                .pathMatchers(HttpMethod.GET, "/**").permitAll()
                 .pathMatchers("/auth/**").permitAll()
 //                .pathMatchers( "/druid/*").permitAll()
                 .pathMatchers("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**").permitAll()
@@ -108,7 +110,7 @@ public class SecurityConfiguration {
                 .csrf().disable().securityContextRepository(repository);
         MyRestfulSuccessHandler handler = new MyRestfulSuccessHandler();
         http.formLogin().authenticationSuccessHandler(new DelegatingServerAuthenticationSuccessHandler(handler))
-                .loginPage("http://39.98.172.236:9000")
+                .loginPage("/login")
                 .authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.FORBIDDEN))
                 .authenticationFailureHandler(authenticationFailureHandler())
                 .and().logout().logoutUrl("/signout");
