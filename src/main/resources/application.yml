@@ -5,7 +5,7 @@ spring:
   application:
     name: food-sas-service
   datasource:
-    url: jdbc:mysql://39.98.172.236:3306/sas?useUnicode=true&connectTimeout=2000&socketTimeout=6000&autoReconnect=true&rewriteBatchedStatements=TRUE
+    url: jdbc:mysql://39.98.172.236:3306/sas?useUnicode=true&connectTimeout=2000&socketTimeout=6000&rewriteBatchedStatements=TRUE&serverTimezone=Hongkong
     username: root
     password: 123456
   jpa:
@@ -13,6 +13,8 @@ spring:
     generate-ddl: true
     properties:
       hibernate:
+        dialect:
+          storage_engine: innodb
         jdbc:
           batch_size: 5000
           batch_versioned_data: true
@@ -21,6 +23,12 @@ spring:
         naming:
           physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  jackson:
+    locale: zh_CN
+#  webflux:
+#    static-path-pattern: /**
+#  resources:
+#    static-locations: file:/data/img/,classpath:/META-INF/resources/,classpath:/resources/, classpath:/static/
 
 
 swagger:
@@ -28,3 +36,5 @@ swagger:
   basePackage: 'com.food.sas.controller'
 
 file-path: '/usr/local/sas/'
+
+

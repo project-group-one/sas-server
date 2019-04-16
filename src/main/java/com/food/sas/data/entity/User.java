@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -16,6 +19,7 @@ import java.util.Date;
  */
 @Data
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class User implements Serializable {
 
     private static final long serialVersionUID = -6160174661276087435L;
@@ -43,7 +47,7 @@ public class User implements Serializable {
     private String role;
 
     @CreatedDate
-    private Date createDate;
+    private LocalDateTime createDate;
 
     private Integer orgizationId;
 

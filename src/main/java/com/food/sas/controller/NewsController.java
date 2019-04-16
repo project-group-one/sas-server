@@ -44,9 +44,9 @@ public class NewsController {
 
     @ApiOperation("获取新闻资讯列表")
     @GetMapping
-    public BaseResult<?> getNewsList(NewsDTO dto, @RequestParam(value = "page", defaultValue = "1") int page,
+    public BaseResult<?> getNewsList(NewsDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
                                      @RequestParam(value = "size", defaultValue = "20") int size) {
-        Page<NewsDTO> result = newsService.getNewsList(dto, PageRequest.of(page - 1 < 0 ? 0 : page, size));
+        Page<NewsDTO> result = newsService.getNewsList(dto, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));
         return new BaseResult<>(result.getContent(), result);
     }
 

@@ -3,12 +3,11 @@ package com.food.sas.data.entity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Temporal;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -16,6 +15,7 @@ import java.util.Date;
  */
 @Entity
 @Data
+@EntityListeners(AuditingEntityListener.class)
 public class News implements Serializable {
 
     @Id
@@ -29,7 +29,7 @@ public class News implements Serializable {
     private String author;
 
     @CreatedDate
-    private Date releaseTime;
+    private LocalDateTime releaseTime;
 
     private String keywords;
 

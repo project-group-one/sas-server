@@ -24,7 +24,7 @@ public class FocalPictureController {
 
     @ApiOperation("查询焦点图")
     @GetMapping
-    public BaseResult<?> searchFocalPicture(@RequestParam String name, @RequestParam(value = "page", defaultValue = "1") int page,
+    public BaseResult<?> searchFocalPicture(@RequestParam String name, @RequestParam(value = "current", defaultValue = "1") int page,
                                             @RequestParam(value = "size", defaultValue = "20") int size) {
         Page<FocalPictureDTO> result = service.searchFocalPicture(name, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));
 

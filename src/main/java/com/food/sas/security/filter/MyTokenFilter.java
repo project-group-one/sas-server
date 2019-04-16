@@ -1,9 +1,11 @@
 package com.food.sas.security.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.food.sas.data.dto.UserDTO;
+import com.food.sas.security.SecurityConfiguration;
 import com.food.sas.security.jwt.JwtBody;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.crypto.macs.HMac;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,10 +15,7 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.jwt.JwtHelper;
-import org.springframework.security.jwt.crypto.sign.MacSigner;
-import org.springframework.security.jwt.crypto.sign.Signer;
 import org.springframework.security.jwt.crypto.sign.SignerVerifier;
-import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -57,17 +56,31 @@ public class MyTokenFilter implements WebFilter {
                 String token = allToken.substring(TOKEN_HEAD.length() + 1);
                 String json = JwtHelper.decode(token).getClaims();
                 UserDetails userDetails = JSON.parseObject(json, User.class);
+
                 final Mono<Authentication> authentication = userDetailsService.findByUsername(userDetails.getUsername()).filter(u -> u.getPassword().equals(userDetails.getPassword()))
                         .switchIfEmpty(Mono.defer(() -> Mono.error(new BadCredentialsException("Invalid Credentials"))))
                         .map(u -> new UsernamePasswordAuthenticationToken(u, u.getPassword(), u.getAuthorities()));
+//
+//                SecurityContextImpl securityContext = new SecurityContextImpl();
+//                authentication.subscribe(authentication1 -> {
+//                    securityContext.setAuthentication(authentication1);
+//                });
+//                repository.save(exchange, securityContext).then(Mono.empty())
+//                        .subscriberContext(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)))
+//                        .subscribe();
 
-                SecurityContextImpl securityContext = new SecurityContextImpl();
-                authentication.subscribe(authentication1 -> {
+                return authentication.flatMap(authentication1 -> {
+                    SecurityContextImpl securityContext = new SecurityContextImpl();
                     securityContext.setAuthentication(authentication1);
+                    if (securityContext.getAuthentication() == null) {
+                        exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                        return chain.filter(exchange);
+                    }
+                    repository.save(exchange, securityContext).then(Mono.empty())
+                            .subscriberContext(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)))
+                            .subscribe();
+                    return chain.filter(exchange);
                 });
-                repository.save(exchange, securityContext).then(Mono.empty())
-                        .subscriberContext(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)))
-                        .subscribe();
             }
 
         }

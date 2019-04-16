@@ -86,6 +86,7 @@
             <artifactId>spring-data-jpa-entity-graph</artifactId>
             <version>2.0.7</version>
         </dependency>
+
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -156,6 +157,18 @@
             <version>1.2.54</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.14.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>4.0.3</version>
+        </dependency>
+
 
     </dependencies>
 
@@ -185,7 +198,7 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>1.2.0</version>
                 <configuration>
                     <imageName>${docker.image.prefix}/${project.artifactId}-ygdxd</imageName>
                     <imageTags>

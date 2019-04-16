@@ -25,7 +25,7 @@ public class OrganizationController {
 
     @ApiOperation("查询组织")
     @GetMapping
-    public BaseResult<List<OrganizationDTO>> searchOrganization(@RequestParam String name, @RequestParam(value = "page", defaultValue = "1") int page,
+    public BaseResult<List<OrganizationDTO>> searchOrganization(@RequestParam String name, @RequestParam(value = "current", defaultValue = "1") int page,
                                                                 @RequestParam(value = "size", defaultValue = "20") int size) {
 
         Page<OrganizationDTO> result = service.searchOrganization(name, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));

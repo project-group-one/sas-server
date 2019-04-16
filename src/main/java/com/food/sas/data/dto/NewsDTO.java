@@ -3,8 +3,10 @@ package com.food.sas.data.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author Created by ygdxd_admin at 2018-12-22 3:44 PM
@@ -41,5 +43,8 @@ public class NewsDTO implements Serializable {
 
     @ApiModelProperty("内容存储地址")
     private String storeUrl;
+
+    @ApiModelProperty("创建时间")
+    private LocalDateTime releaseTime;
 
 }

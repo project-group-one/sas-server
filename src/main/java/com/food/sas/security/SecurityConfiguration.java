@@ -97,6 +97,12 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, ReactiveAuthenticationManager reactiveAuthenticationManager, WebSessionServerSecurityContextRepository repository, MyMapReactiveUserDetailsService userDetailsService) {
+        MyRestfulSuccessHandler handler = new MyRestfulSuccessHandler();
+        http.formLogin().authenticationSuccessHandler(new DelegatingServerAuthenticationSuccessHandler(handler))
+                .loginPage("/login")
+                .authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.FORBIDDEN))
+                .authenticationFailureHandler(authenticationFailureHandler())
+                .and().logout().logoutUrl("/signout");
         http
                 .addFilterAt(new MyTokenFilter(KEY, HMAC, userDetailsService, repository), SecurityWebFiltersOrder.FIRST)
                 .authenticationManager(reactiveAuthenticationManager)
@@ -108,12 +114,6 @@ public class SecurityConfiguration {
                 .anyExchange().authenticated()
                 .and()
                 .csrf().disable().securityContextRepository(repository);
-        MyRestfulSuccessHandler handler = new MyRestfulSuccessHandler();
-        http.formLogin().authenticationSuccessHandler(new DelegatingServerAuthenticationSuccessHandler(handler))
-                .loginPage("/login")
-                .authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.FORBIDDEN))
-                .authenticationFailureHandler(authenticationFailureHandler())
-                .and().logout().logoutUrl("/signout");
         return http.build();
     }
 
