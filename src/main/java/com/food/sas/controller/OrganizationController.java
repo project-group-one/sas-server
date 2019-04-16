@@ -8,8 +8,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -18,7 +16,7 @@ import java.util.List;
 /**
  * @author Created by ygdxd_admin at 2019-01-06 8:20 PM
  */
-@RequestMapping("/organization")
+@RequestMapping("/api/organization")
 @RestController
 @Api(tags = "组织管理")
 public class OrganizationController {
@@ -27,11 +25,11 @@ public class OrganizationController {
 
     @ApiOperation("查询组织")
     @GetMapping
-    public BaseResult<?> searchOrganization(@RequestParam String name, @RequestParam(value = "page", defaultValue = "1") int page,
-                                            @RequestParam(value = "size", defaultValue = "20") int size) {
+    public BaseResult<List<OrganizationDTO>> searchOrganization(@RequestParam String name, @RequestParam(value = "page", defaultValue = "1") int page,
+                                                                @RequestParam(value = "size", defaultValue = "20") int size) {
 
         Page<OrganizationDTO> result = service.searchOrganization(name, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));
-        return new BaseResult<List<OrganizationDTO>>(result.getContent(), result);
+        return new BaseResult<>(result.getContent(), result);
     }
 
     @ApiOperation("新增组织")

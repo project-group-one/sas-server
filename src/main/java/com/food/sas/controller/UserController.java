@@ -1,18 +1,15 @@
 package com.food.sas.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.UserDTO;
 import com.food.sas.security.service.MyMapReactiveUserDetailsService;
 import com.food.sas.service.IUserService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -26,7 +23,7 @@ import java.util.List;
  * @author Created by ygdxd_admin at 2018-12-25 7:15 PM
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @Api(tags = "用户管理")
 public class UserController {
 
@@ -55,10 +52,10 @@ public class UserController {
     //    @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("用户列表查询 查询参数 username(半模糊) address type name(半模糊)")
     @GetMapping
-    public BaseResult<?> getUserPages(UserDTO dto, @RequestParam(value = "page", defaultValue = "1") int page,
-                                      @RequestParam(value = "size", defaultValue = "20") int size) {
+    public BaseResult<List<UserDTO>> getUserPages(UserDTO dto, @RequestParam(value = "page", defaultValue = "1") int page,
+                                                  @RequestParam(value = "size", defaultValue = "20") int size) {
         Page<UserDTO> result = userService.getUserPage(dto, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));
-        return new BaseResult<List<UserDTO>>(result.getContent(), result);
+        return new BaseResult<>(result.getContent(), result);
     }
 
     //    @PreAuthorize("hasRole('ADMIN')")

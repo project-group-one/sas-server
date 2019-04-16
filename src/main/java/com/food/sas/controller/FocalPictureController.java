@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
  * @author Created by ygdxd_admin at 2019-01-08 9:36 PM
  */
 @Api(tags = "焦点图")
-@RequestMapping("/pic")
+@RequestMapping("/api/pic")
 @RestController
 public class FocalPictureController {
 
