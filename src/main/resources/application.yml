@@ -25,6 +25,8 @@ spring:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
   jackson:
     locale: zh_CN
+  resources:
+    static-locations: file:/tmp
 #  webflux:
 #    static-path-pattern: /**
 #  resources:
@@ -36,5 +38,7 @@ swagger:
   basePackage: 'com.food.sas.controller'
 
 file-path: '/usr/local/sas/'
+
+
 
 

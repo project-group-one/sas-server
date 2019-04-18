@@ -1,7 +1,9 @@
 package com.food.sas.data.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -12,6 +14,7 @@ import java.util.Date;
 @Data
 @Table(name = "t_focal_picture")
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class FocalPicture {
 
     @Id
@@ -27,5 +30,6 @@ public class FocalPicture {
     @CreatedDate
     private Date createDate;
 
+    @CreatedBy
     private Integer creator;
 }
