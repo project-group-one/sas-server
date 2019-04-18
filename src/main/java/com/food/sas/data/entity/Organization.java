@@ -1,6 +1,7 @@
 package com.food.sas.data.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -27,6 +28,9 @@ public class Organization implements Serializable {
 
     @CreatedDate
     private LocalDateTime createDate;
+
+    @CreatedBy
+    private Integer creator;
 
 
 }

@@ -3,11 +3,15 @@ package com.food.sas.controller;
 import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.OrganizationDTO;
 import com.food.sas.service.IOrganizationService;
+import com.food.sas.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -21,7 +25,11 @@ import java.util.List;
 @Api(tags = "组织管理")
 public class OrganizationController {
 
+    @Autowired
     private IOrganizationService service;
+
+    @Autowired
+    private IUserService userService;
 
     @ApiOperation("查询组织")
     @GetMapping
@@ -34,7 +42,8 @@ public class OrganizationController {
 
     @ApiOperation("新增组织")
     @PostMapping
-    public Mono<?> createOrganization(@RequestBody OrganizationDTO body) {
+    public Mono<?> createOrganization(@RequestBody OrganizationDTO body, Authentication authentication) {
+        body.setCreator(userService.findUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername()).getId());
         service.createOrganization(body);
         return Mono.empty();
     }
