@@ -1,5 +1,6 @@
 package com.food.sas.data.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -16,7 +17,9 @@ public class CommentRequest {
     @NotNull
     private String content;
 
+    @ApiModelProperty(hidden = true)
     private Long userId;
 
+    @ApiModelProperty(hidden = true)
     private String userName;
 }

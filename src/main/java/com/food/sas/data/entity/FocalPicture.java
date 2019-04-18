@@ -31,5 +31,5 @@ public class FocalPicture {
     private Date createDate;
 
     @CreatedBy
-    private Integer creator;
+    private Long creator;
 }

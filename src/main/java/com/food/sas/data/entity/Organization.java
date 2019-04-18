@@ -30,7 +30,7 @@ public class Organization implements Serializable {
     private LocalDateTime createDate;
 
     @CreatedBy
-    private Integer creator;
+    private Long creator;
 
 
 }

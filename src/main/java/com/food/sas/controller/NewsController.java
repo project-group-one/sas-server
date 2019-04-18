@@ -3,18 +3,25 @@ package com.food.sas.controller;
 import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.CommentRequest;
 import com.food.sas.data.dto.NewsDTO;
+import com.food.sas.data.dto.UserDTO;
 import com.food.sas.service.INewsService;
+import com.food.sas.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 /**
@@ -23,11 +30,12 @@ import java.util.UUID;
 @Api(tags = "新闻管理")
 @RequestMapping("/api/news")
 @RestController
+@AllArgsConstructor
 public class NewsController {
 
-    @Autowired
     private INewsService newsService;
 
+    private IUserService userService;
 
     @ApiOperation("获得单个新闻内容")
     @GetMapping("/{id}")
@@ -88,7 +96,11 @@ public class NewsController {
     }
 
     @PostMapping("/comments")
-    public Mono<Void> createComment(@RequestBody @Valid CommentRequest request) {
+    public Mono<Void> createComment(@RequestBody @Valid CommentRequest request,
+                                    Authentication authentication) {
+        UserDTO userDTO = userService.findUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername());
+        request.setUserId(userDTO.getId());
+        request.setUserName(userDTO.getName());
         return newsService.createComment(request);
     }
 }

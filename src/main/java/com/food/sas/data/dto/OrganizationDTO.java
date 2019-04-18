@@ -19,6 +19,6 @@ public class OrganizationDTO implements Serializable {
 
     private Date createDate;
 
-    private Integer creator;
+    private Long creator;
 
 }
