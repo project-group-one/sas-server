@@ -17,6 +17,9 @@ public class NewsDTO implements Serializable {
 
     private static final long serialVersionUID = -3125369105515122379L;
 
+    @ApiModelProperty("id")
+    private Integer id;
+
     @ApiModelProperty("新闻标题")
     private String title;
 
