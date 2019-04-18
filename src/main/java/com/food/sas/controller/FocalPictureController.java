@@ -40,14 +40,14 @@ public class FocalPictureController {
 
     @ApiOperation("修改焦点图 名称 路径")
     @PutMapping("/{id}")
-    public Mono<?> modifyFocalPicture(@RequestBody FocalPictureDTO body, @PathVariable Integer id) {
+    public Mono<?> modifyFocalPicture(@RequestBody FocalPictureDTO body, @PathVariable Long id) {
         service.modifyFocalPicture(body, id);
         return Mono.empty();
     }
 
     @ApiOperation("删除焦点图")
     @DeleteMapping
-    public Mono<?> deleteFocalPicture(@RequestParam Integer[] ids) {
+    public Mono<?> deleteFocalPicture(@RequestParam Long[] ids) {
         service.batchDeleteFocalPicture(ids);
         return Mono.just(true);
     }

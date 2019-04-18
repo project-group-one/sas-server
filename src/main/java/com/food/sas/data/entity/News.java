@@ -1,6 +1,5 @@
 package com.food.sas.data.entity;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -8,7 +7,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author Created by ygdxd_admin at 2018-12-22 2:49 PM
@@ -20,7 +20,7 @@ public class News implements Serializable {
 
     @Id
     @GeneratedValue
-    private Integer id;
+    private Long id;
 
     private String title;
 
@@ -45,4 +45,7 @@ public class News implements Serializable {
     private String imgUrl;
 
     private Integer viewCount;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "news")
+    private Set<Comment> comments = new LinkedHashSet<>();
 }

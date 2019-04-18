@@ -19,7 +19,7 @@ public class User implements UserDetails {
     // ~ Instance fields
     // ================================================================================================
 
-    private Integer id;
+    private Long id;
 
     private Integer type;
 
@@ -31,7 +31,7 @@ public class User implements UserDetails {
     private final boolean credentialsNonExpired;
     private final boolean enabled;
 
-    public User(Integer id, Integer type, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public User(Long id, Integer type, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         this(username, password, authorities);
         this.id = id;
         this.type = type;

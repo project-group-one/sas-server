@@ -13,7 +13,7 @@ public interface IFocalPictureService {
 
     void createFocalPicture(FocalPictureDTO dto);
 
-    void modifyFocalPicture(FocalPictureDTO dto, Integer id);
+    void modifyFocalPicture(FocalPictureDTO dto, Long id);
 
-    void batchDeleteFocalPicture(Integer[] ids);
+    void batchDeleteFocalPicture(Long[] ids);
 }

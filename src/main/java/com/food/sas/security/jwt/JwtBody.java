@@ -1,6 +1,7 @@
 package com.food.sas.security.jwt;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -8,11 +9,12 @@ import java.io.Serializable;
  * @author Created by ygdxd_admin at 2019-01-15 8:31 PM
  */
 @Data
+@NoArgsConstructor
 public class JwtBody implements Serializable {
 
     private String accessToken;
 
-    private Integer userId;
+    private Long userId;
 
     private Integer userType;
 
@@ -20,8 +22,6 @@ public class JwtBody implements Serializable {
 
     private String refreshToken;
 
-    public JwtBody() {
-    }
 
     public JwtBody(Builder builder) {
         this.accessToken = builder.accessToken;
@@ -39,7 +39,7 @@ public class JwtBody implements Serializable {
 
         private String accessToken;
 
-        private Integer userId;
+        private Long userId;
 
         private Integer userType;
 
@@ -52,7 +52,7 @@ public class JwtBody implements Serializable {
             return this;
         }
 
-        public Builder setUserId(Integer userId) {
+        public Builder setUserId(Long userId) {
             this.userId = userId;
             return this;
         }

@@ -48,7 +48,7 @@ public class FocalPictureServiceImpl implements IFocalPictureService {
     }
 
     @Override
-    public void modifyFocalPicture(FocalPictureDTO dto, Integer id) {
+    public void modifyFocalPicture(FocalPictureDTO dto, Long id) {
         focalPictureRepository.findById(id).ifPresent(focalPicture -> {
             if (StringUtils.isNotEmpty(dto.getImgUrl())) {
                 focalPicture.setImgUrl(dto.getImgUrl());
@@ -62,10 +62,10 @@ public class FocalPictureServiceImpl implements IFocalPictureService {
     }
 
     @Override
-    public void batchDeleteFocalPicture(Integer[] ids) {
+    public void batchDeleteFocalPicture(Long[] ids) {
         if (ids != null && ids.length > 0) {
             List<FocalPicture> list = new ArrayList<>();
-            for (Integer id : ids) {
+            for (Long id : ids) {
                 FocalPicture focalPicture = new FocalPicture();
                 focalPicture.setId(id);
                 list.add(focalPicture);

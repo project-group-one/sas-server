@@ -13,7 +13,7 @@ public interface IOrganizationService {
 
     void createOrganization(OrganizationDTO dto);
 
-    void modifyOrganization(OrganizationDTO dto, Integer id);
+    void modifyOrganization(OrganizationDTO dto, Long id);
 
-    void batchDeleteOrganization(Integer[] ids);
+    void batchDeleteOrganization(Long[] ids);
 }

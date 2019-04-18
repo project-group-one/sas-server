@@ -13,7 +13,7 @@ public class FocalPictureDTO implements Serializable {
 
     private static final long serialVersionUID = 3751196782898863740L;
 
-    private Integer id;
+    private Long id;
 
     private String name;
 

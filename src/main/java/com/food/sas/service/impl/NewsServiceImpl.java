@@ -1,21 +1,25 @@
 package com.food.sas.service.impl;
 
+import com.food.sas.data.dto.CommentRequest;
 import com.food.sas.data.dto.NewsDTO;
+import com.food.sas.data.entity.Comment;
 import com.food.sas.data.entity.News;
 import com.food.sas.data.entity.QNews;
 import com.food.sas.data.repository.NewsRepository;
+import com.food.sas.mapper.CommentMapper;
 import com.food.sas.mapper.NewsMapper;
 import com.food.sas.service.INewsService;
+import com.google.common.collect.Sets;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Created by ygdxd_admin at 2018-12-22 9:13 PM
@@ -37,12 +41,12 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
-    public NewsDTO getNewsById(Integer id) {
+    public NewsDTO getNewsById(Long id) {
         return NewsMapper.MAPPER.fromEntity(newsRepository.findById(id).get());
     }
 
     @Override
-    public boolean deleteNews(Integer id) {
+    public boolean deleteNews(Long id) {
         newsRepository.deleteById(id);
         return true;
     }
@@ -65,4 +69,14 @@ public class NewsServiceImpl implements INewsService {
         return new PageImpl<>(NewsMapper.MAPPER.fromEntitys(page.getContent()), pageable, page.getTotalElements());
     }
 
+    @Override
+    public Mono<Void> createComment(CommentRequest request) {
+        Optional<News> newsOptional = newsRepository.findById(request.getNewsId());
+        newsOptional.ifPresent(news -> {
+            Comment comment = CommentMapper.MAPPER.toEntity(request);
+            news.setComments(Sets.newHashSet(comment));
+            newsRepository.save(news);
+        });
+        return Mono.empty();
+    }
 }

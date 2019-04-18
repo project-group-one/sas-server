@@ -7,13 +7,10 @@ import com.food.sas.data.repository.OrganizationRepository;
 import com.food.sas.mapper.OrganizationMapper;
 import com.food.sas.service.IOrganizationService;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Query;
 import com.querydsl.core.QueryResults;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -57,7 +54,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
     }
 
     @Override
-    public void modifyOrganization(OrganizationDTO dto, Integer id) {
+    public void modifyOrganization(OrganizationDTO dto, Long id) {
         organizationRepository.findById(id).ifPresent(organization -> {
             organization.setName(dto.getName());
             organizationRepository.saveAndFlush(organization);
@@ -65,10 +62,10 @@ public class OrganizationServiceImpl implements IOrganizationService {
     }
 
     @Override
-    public void batchDeleteOrganization(Integer[] ids) {
+    public void batchDeleteOrganization(Long[] ids) {
         if (ids != null && ids.length > 0) {
             List<Organization> list = new ArrayList<>(ids.length);
-            for (Integer id : ids) {
+            for (Long id : ids) {
                 Organization organization = new Organization();
                 organization.setId(id);
                 list.add(organization);

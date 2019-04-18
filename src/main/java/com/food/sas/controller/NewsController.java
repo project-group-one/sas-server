@@ -1,6 +1,7 @@
 package com.food.sas.controller;
 
 import com.food.sas.data.dto.BaseResult;
+import com.food.sas.data.dto.CommentRequest;
 import com.food.sas.data.dto.NewsDTO;
 import com.food.sas.service.INewsService;
 import io.swagger.annotations.Api;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.UUID;
@@ -29,9 +31,8 @@ public class NewsController {
 
     @ApiOperation("获得单个新闻内容")
     @GetMapping("/{id}")
-    public BaseResult<?> getNewsById(@PathVariable Integer id) throws IOException {
+    public BaseResult<?> getNewsById(@PathVariable Long id) throws IOException {
         NewsDTO dto = newsService.getNewsById(id);
-        System.out.println(dto.getStoreUrl());
         if (dto.getStoreUrl() != null) {
             Path path = Paths.get(dto.getStoreUrl());
             if (Files.exists(path)) {
@@ -65,7 +66,7 @@ public class NewsController {
 
     @ApiOperation("修改新闻内容")
     @PutMapping("/{id}")
-    public Mono<?> updateNews(@RequestBody NewsDTO body, @PathVariable Integer id) throws IOException {
+    public Mono<?> updateNews(@RequestBody NewsDTO body, @PathVariable Long id) throws IOException {
         Path old = Paths.get(body.getStoreUrl());
         Files.write(old, body.getContent().getBytes());
         newsService.saveNews(body);
@@ -74,7 +75,7 @@ public class NewsController {
 
     @ApiOperation("删除新闻")
     @DeleteMapping("/{id}")
-    public Mono<?> deleteNews(@PathVariable Integer id) throws IOException {
+    public Mono<?> deleteNews(@PathVariable Long id) throws IOException {
         NewsDTO dto = newsService.getNewsById(id);
         if (dto.getStoreUrl() != null) {
             Path deleteFile = Paths.get(dto.getStoreUrl());
@@ -84,5 +85,10 @@ public class NewsController {
         }
         newsService.deleteNews(id);
         return Mono.empty();
+    }
+
+    @PostMapping("/comments")
+    public Mono<Void> createComment(@RequestBody @Valid CommentRequest request) {
+        return newsService.createComment(request);
     }
 }

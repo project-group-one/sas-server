@@ -1,7 +1,6 @@
 package com.food.sas.service;
 
 import com.food.sas.data.dto.UserDTO;
-import com.food.sas.data.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,15 +15,15 @@ public interface IUserService {
 
     UserDTO createUser(UserDTO dto);
 
-    void modifyManager(UserDTO dto, Integer id);
+    void modifyManager(UserDTO dto, Long id);
 
-    boolean validate(Integer id, Integer type);
+    boolean validate(Long id, Integer type);
 
-    boolean validateById(Integer id, Integer mId);
+    boolean validateById(Long id, Long mId);
 
-    void batchDeleteUser(Integer[] ids);
+    void batchDeleteUser(Long[] ids);
 
-    void freezeUser(Integer id);
+    void freezeUser(Long id);
 
-    void changeRole(Integer mId, Integer role);
+    void changeRole(Long mId, Integer role);
 }

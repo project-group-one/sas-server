@@ -61,7 +61,7 @@ public class UserController {
     //    @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("添加用户")
     @PostMapping
-    public Mono<?> registeredUser(@ApiParam(value = "创建用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Integer id, @RequestBody UserDTO dto) {
+    public Mono<?> registeredUser(@ApiParam(value = "创建用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id, @RequestBody UserDTO dto) {
 
         dto.setRole(ROLE);
         if (!userService.validate(id, dto.getType())) {
@@ -81,7 +81,9 @@ public class UserController {
 
     @ApiOperation("修改用户")
     @PutMapping("/{mId}")
-    public Mono<?> modifyManager(@RequestBody UserDTO dto, @ApiParam("需要修改的用户的id") @PathVariable Integer mId, @ApiParam(value = "修改用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Integer id) {
+    public Mono<?> modifyManager(@RequestBody UserDTO dto,
+                                 @ApiParam("需要修改的用户的id") @PathVariable Long mId,
+                                 @ApiParam(value = "修改用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id) {
         if (!userService.validateById(id, mId)) {
             return Mono.error(new IllegalArgumentException("no access"));
         }
@@ -94,7 +96,8 @@ public class UserController {
 
     @ApiOperation("冻结用户")
     @PostMapping("/{mId}/freeze")
-    public Mono<?> freezeUser(@ApiParam(value = "冻结用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Integer id, @ApiParam("需要冻结的用户id") @PathVariable Integer mId) {
+    public Mono<?> freezeUser(@ApiParam(value = "冻结用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id,
+                              @ApiParam("需要冻结的用户id") @PathVariable Long mId) {
         if (!userService.validateById(id, mId)) {
             return Mono.error(new IllegalArgumentException("no access"));
         }
@@ -105,8 +108,9 @@ public class UserController {
 
     @ApiOperation("删除管理员")
     @DeleteMapping
-    public Mono<?> deleteUser(@ApiParam("id以逗号分隔") @RequestParam Integer[] ids, @ApiParam(value = "删除用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Integer id) {
-        for (Integer mId : ids) {
+    public Mono<?> deleteUser(@ApiParam("id以逗号分隔") @RequestParam Long[] ids,
+                              @ApiParam(value = "删除用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id) {
+        for (Long mId : ids) {
             if (!userService.validateById(id, mId)) {
                 return Mono.error(new IllegalArgumentException("no access"));
             }
@@ -117,7 +121,9 @@ public class UserController {
 
     @ApiOperation("修改用户权限")
     @PutMapping("/{mId}/freeze")
-    public Mono<?> changeRole(@PathVariable Integer mId, @ApiParam(value = "修改用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") Integer id, @ApiParam("1 GUEST 2 NORMAL 4 ADMIN") Integer role) {
+    public Mono<?> changeRole(@PathVariable Long mId,
+                              @ApiParam(value = "修改用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") Long id,
+                              @ApiParam("1 GUEST 2 NORMAL 4 ADMIN") Integer role) {
         if (!userService.validateById(id, mId)) {
             return Mono.error(new IllegalArgumentException("no access"));
         }

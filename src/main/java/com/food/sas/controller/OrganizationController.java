@@ -6,6 +6,7 @@ import com.food.sas.service.IOrganizationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequestMapping("/api/organization")
 @RestController
 @Api(tags = "组织管理")
+@AllArgsConstructor
 public class OrganizationController {
 
     private IOrganizationService service;
@@ -41,13 +43,13 @@ public class OrganizationController {
 
     @ApiOperation("修改组织")
     @PutMapping("/{id}")
-    public Mono<?> modifyOrganization(@PathVariable Integer id, @RequestBody OrganizationDTO body) {
+    public Mono<?> modifyOrganization(@PathVariable Long id, @RequestBody OrganizationDTO body) {
         service.modifyOrganization(body, id);
         return Mono.empty();
     }
 
     @ApiOperation("删除组织")
-    public Mono<?> deleteOrganization(@ApiParam("ids") @RequestParam Integer[] ids) {
+    public Mono<?> deleteOrganization(@ApiParam("ids") @RequestParam Long[] ids) {
         service.batchDeleteOrganization(ids);
         return Mono.empty();
     }

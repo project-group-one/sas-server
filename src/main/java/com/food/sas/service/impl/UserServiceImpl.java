@@ -73,7 +73,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void modifyManager(UserDTO dto, Integer id) {
+    public void modifyManager(UserDTO dto, Long id) {
         userRepository.findById(id).ifPresent(user -> {
             if (StringUtils.isNotEmpty(dto.getName())) {
                 user.setName(dto.getName());
@@ -93,7 +93,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public boolean validate(Integer id, Integer type) {
+    public boolean validate(Long id, Integer type) {
         Optional<User> optional = userRepository.findById(id);
         if (optional.isPresent() && optional.get().getType() > type) {
             return true;
@@ -102,7 +102,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public boolean validateById(Integer id, Integer mId) {
+    public boolean validateById(Long id, Long mId) {
         //操作用户
         Optional<User> user1 = userRepository.findById(id);
         //被更改的用户
@@ -115,10 +115,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void batchDeleteUser(Integer[] ids) {
+    public void batchDeleteUser(Long[] ids) {
         if (ids != null && ids.length > 1) {
             List<User> list = new ArrayList<>(ids.length);
-            for (Integer id : ids) {
+            for (Long id : ids) {
                 User user = new User();
                 user.setId(id);
                 list.add(user);
@@ -128,7 +128,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void freezeUser(Integer id) {
+    public void freezeUser(Long id) {
         userRepository.findById(id).ifPresent(user -> {
             user.setStatus(FREEZED_STATUS);
             userRepository.saveAndFlush(user);
@@ -136,7 +136,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void changeRole(Integer mId, Integer role) {
+    public void changeRole(Long mId, Integer role) {
         userRepository.findById(mId).ifPresent(user -> {
             user.setRole(getRole(role));
             userRepository.saveAndFlush(user);
