@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -52,6 +53,7 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
+    @Transactional
     public Page<NewsDTO> getNewsList(NewsDTO dto, Pageable pageable) {
         QNews qNews = QNews.news;
         BooleanBuilder builder = new BooleanBuilder();
