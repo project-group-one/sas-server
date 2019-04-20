@@ -26,18 +26,14 @@ spring:
   jackson:
     locale: zh_CN
   resources:
-    static-locations: file:/tmp
-#  webflux:
-#    static-path-pattern: /**
-#  resources:
-#    static-locations: file:/data/img/,classpath:/META-INF/resources/,classpath:/resources/, classpath:/static/
+    static-locations: ["classpath:/static/upload/"]
+  webflux:
+    static-path-pattern: /uploads/**
 
 
 swagger:
   groupName: 'sas-service-api'
   basePackage: 'com.food.sas.controller'
-
-file-path: '/usr/local/sas/'
 
 
 

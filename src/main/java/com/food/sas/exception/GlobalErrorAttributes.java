@@ -1,3 +1,4 @@
+/*
 package com.food.sas.exception;
 
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
@@ -9,9 +10,11 @@ import java.rmi.ServerException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+*/
 /**
  * Created by zj on 2018/12/22
- */
+ *//*
+
 @Component
 public class GlobalErrorAttributes extends DefaultErrorAttributes {
 
@@ -37,3 +40,4 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
         return errorAttributes;
     }
 }
+*/
