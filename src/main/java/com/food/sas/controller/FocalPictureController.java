@@ -31,6 +31,13 @@ public class FocalPictureController {
     @Autowired
     private IUserService userService;
 
+    @ApiOperation("获取单个焦点图")
+    @GetMapping("/{id}")
+    public Mono<?> searchFocalPicture(@PathVariable Long id) {
+        return Mono.just(service.searchFocalPicture(id));
+    }
+
+
     @ApiOperation("查询焦点图")
     @GetMapping
     public BaseResult<?> searchFocalPicture(@RequestParam(required = false) String name, @RequestParam(value = "current", defaultValue = "1") int page,

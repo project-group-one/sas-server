@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
  */
 public interface IFocalPictureService {
 
+    FocalPictureDTO searchFocalPicture(Long id);
+
     Page<FocalPictureDTO> searchFocalPicture(String name, Pageable pageable);
 
     void createFocalPicture(FocalPictureDTO dto);

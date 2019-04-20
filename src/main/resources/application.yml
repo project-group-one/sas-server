@@ -8,6 +8,8 @@ spring:
     url: jdbc:mysql://39.98.172.236:3306/sas?useUnicode=true&connectTimeout=2000&socketTimeout=6000&rewriteBatchedStatements=TRUE&serverTimezone=Hongkong
     username: root
     password: 123456
+    hikari:
+      maximum-pool-size: 5
   jpa:
     show-sql: true
     generate-ddl: true
@@ -34,6 +36,12 @@ spring:
 swagger:
   groupName: 'sas-service-api'
   basePackage: 'com.food.sas.controller'
+
+
+sms.TemplateCode: SMS_157445055
+sms.SignName: 安全抽检
+sms.accessKeyId: LTAIxGYss93KmEQM
+sms.accessSecret: tcyo7lOD4WuM7DJrqgTOshhfHwZNLd
 
 
 
