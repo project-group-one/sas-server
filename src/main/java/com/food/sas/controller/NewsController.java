@@ -3,7 +3,6 @@ package com.food.sas.controller;
 import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.CommentRequest;
 import com.food.sas.data.dto.NewsDTO;
-import com.food.sas.data.dto.UserDTO;
 import com.food.sas.service.INewsService;
 import com.food.sas.service.IUserService;
 import io.swagger.annotations.Api;
@@ -11,8 +10,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -97,11 +94,7 @@ public class NewsController {
     }
 
     @PostMapping("/comments")
-    public Mono<Void> createComment(@RequestBody @Valid CommentRequest request,
-                                    Authentication authentication) {
-        UserDTO userDTO = userService.findUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername());
-        request.setUserId(userDTO.getId());
-        request.setUserName(userDTO.getName());
+    public Mono<Void> createComment(@RequestBody @Valid CommentRequest request) {
         return newsService.createComment(request);
     }
 }

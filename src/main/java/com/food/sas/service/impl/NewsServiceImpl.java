@@ -9,7 +9,6 @@ import com.food.sas.data.repository.NewsRepository;
 import com.food.sas.mapper.CommentMapper;
 import com.food.sas.mapper.NewsMapper;
 import com.food.sas.service.INewsService;
-import com.google.common.collect.Sets;
 import com.querydsl.core.BooleanBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +75,8 @@ public class NewsServiceImpl implements INewsService {
         Optional<News> newsOptional = newsRepository.findById(request.getNewsId());
         newsOptional.ifPresent(news -> {
             Comment comment = CommentMapper.MAPPER.toEntity(request);
-            news.setComments(Sets.newHashSet(comment));
+            comment.setNews(news);
+            news.getComments().add(comment);
             newsRepository.save(news);
         });
         return Mono.empty();
