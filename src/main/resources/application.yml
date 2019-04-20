@@ -27,10 +27,10 @@ spring:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
   jackson:
     locale: zh_CN
-  resources:
-    static-locations: ["classpath:/static/upload/"]
-  webflux:
-    static-path-pattern: /uploads/**
+    #resources:
+    # static-locations: ["classpath:/static/upload/"]
+  # webflux:
+  #   static-path-pattern: /uploads/**
 
 
 swagger:

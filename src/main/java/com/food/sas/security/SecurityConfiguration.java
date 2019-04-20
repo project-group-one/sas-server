@@ -110,7 +110,7 @@ public class SecurityConfiguration {
                 .pathMatchers("/api/user/phone").permitAll()
                 .pathMatchers("/auth/**").permitAll()
 //                .pathMatchers( "/druid/*").permitAll()
-                .pathMatchers("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/api/files").permitAll()
+                .pathMatchers("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/api/files", "/uploads/**").permitAll()
                 .anyExchange().authenticated()
                 .and()
                 .csrf().disable().securityContextRepository(repository);

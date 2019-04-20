@@ -3,7 +3,6 @@ VOLUME /tmp
 VOLUME /heap
         VOLUME /data
 ADD sas.jar app.jar
-ADD ./static/upload/ ./static/upload/
 RUN sh -c 'touch /app.jar'
 ENV JVM_OPTS="-Xmx2048m"
 ENV JAVA_OPTS=""
