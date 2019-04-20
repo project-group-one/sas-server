@@ -108,6 +108,7 @@ public class SecurityConfiguration {
                 .authenticationManager(reactiveAuthenticationManager)
                 .authorizeExchange()
                 .pathMatchers(HttpMethod.GET, "/**").permitAll()
+                .pathMatchers("/api/user/phone").permitAll()
                 .pathMatchers("/auth/**").permitAll()
 //                .pathMatchers( "/druid/*").permitAll()
                 .pathMatchers("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**").permitAll()

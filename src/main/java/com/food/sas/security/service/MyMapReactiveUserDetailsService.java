@@ -1,6 +1,8 @@
 package com.food.sas.security.service;
 
+import com.food.sas.data.dto.UserDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
@@ -14,20 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
-import reactor.core.publisher.Mono;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author Created by ygdxd_admin at 2019-01-05 3:04 PM
@@ -90,8 +79,13 @@ public class MyMapReactiveUserDetailsService
         return username.toLowerCase();
     }
 
+    public void addUserDetail(UserDTO dto) {
+//        users.put(new User.UserBuilder().username(dto.getUsername()).password(dto.getPassword()).passwordEncoder(s -> s).authorities(dto.getRole().split(",")).build());
+        users.put(dto.getUsername(), new com.food.sas.security.User(dto.getUsername(), dto.getPassword(), AuthorityUtils.createAuthorityList(dto.getRole().split(","))));
+    }
+
     public void addUserDetail(UserDetails userDetails){
-//        users.put(userDetails.)
+        users.put(userDetails.getUsername(), userDetails);
     }
 
     public void freezeUser(String username){

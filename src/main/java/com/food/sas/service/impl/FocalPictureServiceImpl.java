@@ -8,6 +8,7 @@ import com.food.sas.mapper.FocalPictureMapper;
 import com.food.sas.service.IFocalPictureService;
 import com.querydsl.core.BooleanBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Created by ygdxd_admin at 2019-01-08 9:51 PM
@@ -30,6 +32,12 @@ public class FocalPictureServiceImpl implements IFocalPictureService {
 
     @Autowired
     private EntityManager em;
+
+    @Override
+    public FocalPictureDTO searchFocalPicture(Long id) {
+        Optional<FocalPicture> optional = focalPictureRepository.findById(id);
+        return Mappers.getMapper(FocalPictureMapper.class).fromEntity(optional.get());
+    }
 
     @Override
     public Page<FocalPictureDTO> searchFocalPicture(String name, Pageable pageable) {

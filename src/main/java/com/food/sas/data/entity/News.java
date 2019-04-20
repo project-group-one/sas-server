@@ -46,6 +46,6 @@ public class News implements Serializable {
 
     private Integer viewCount;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "news")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "news", fetch = FetchType.EAGER)
     private Set<Comment> comments = new LinkedHashSet<>();
 }

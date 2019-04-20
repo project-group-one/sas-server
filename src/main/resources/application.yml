@@ -40,5 +40,11 @@ swagger:
 file-path: '/usr/local/sas/'
 
 
+sms.TemplateCode: SMS_157445055
+sms.SignName: 安全抽检
+sms.accessKeyId: LTAIxGYss93KmEQM
+sms.accessSecret: tcyo7lOD4WuM7DJrqgTOshhfHwZNLd
+
+
 
 

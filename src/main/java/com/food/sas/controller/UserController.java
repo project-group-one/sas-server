@@ -1,12 +1,17 @@
 package com.food.sas.controller;
 
+import com.food.sas.config.SmsSender;
 import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.UserDTO;
+import com.food.sas.data.entity.VerificationCode;
+import com.food.sas.data.repository.IVerificationCodeRepository;
 import com.food.sas.security.service.MyMapReactiveUserDetailsService;
 import com.food.sas.service.IUserService;
+import com.food.sas.service.IVerificationCodeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +22,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Created by ygdxd_admin at 2018-12-25 7:15 PM
@@ -31,6 +38,8 @@ public class UserController {
 
     private static final String ROLE = "NORMAL";
 
+    private static final String PHONE_REGEX = "^((13[0-9])|(14[5,7,9])|(15[0-3,5-9])|(166)|(17[3,5,6,7,8])|(18[0-9])|(19[8,9]))\\d{8}$";
+
     @Autowired
     private PasswordEncoder encoder;
 
@@ -38,7 +47,13 @@ public class UserController {
     private IUserService userService;
 
     @Autowired
+    private IVerificationCodeService verificationCodeService;
+
+    @Autowired
     private MyMapReactiveUserDetailsService userDetailsService;
+
+    @Autowired
+    private SmsSender sender;
 
     @ApiOperation("登录后调用 获取必要参数")
     @GetMapping("/current")
@@ -131,6 +146,58 @@ public class UserController {
         return Mono.empty();
     }
 
-//    public Mono<?>
+    @ApiOperation("手机注册")
+    @PostMapping("/phone")
+    public Mono<?> phoneRegister(@RequestParam String code, @RequestBody UserDTO userDTO) {
+
+        if (StringUtils.isBlank(userDTO.getUsername()) || StringUtils.isBlank(userDTO.getPassword()) || userDTO.getPhone() == null) {
+            return Mono.error(new RuntimeException("参数错误！"));
+        }
+
+        VerificationCode verificationCode = verificationCodeService.findVerificationCodeByPhone(userDTO.getPhone());
+        if (verificationCode == null || !verificationCode.getPhone().equals(userDTO.getPhone()) || verificationCode.getRegistered() > 0 || verificationCode.getExpired().isBefore(LocalDateTime.now()) || !verificationCode.getCode().equals(code)) {
+            return Mono.error(new RuntimeException("注册失败！"));
+        }
+        userDTO.setStatus(0);
+        userDTO.setRole("CLIENT");
+        userDTO.setId(null);
+        userDTO.setType(0);
+        userDTO.setPassword(SALT + encoder.encode(userDTO.getPassword()));
+        userService.createUser(userDTO);
+        verificationCode.setRegistered(1);
+        verificationCodeService.saveOrUpdateVerificationCode(verificationCode);
+
+        userDetailsService.addUserDetail(userDTO);
+        return Mono.empty();
+    }
+
+
+    @ApiOperation("发送验证码")
+    @GetMapping("/code")
+    public Mono<?> sendSMS(@RequestParam String phone) {
+        if (phone.length() != 11 || !phone.matches(PHONE_REGEX)) {
+            return Mono.error(new IllegalArgumentException("手机号格式错误"));
+        }
+
+        int i = 1000000 + ThreadLocalRandom.current().nextInt(999999);
+        String code = String.valueOf(i).substring(1);
+        if (sender.send(phone, code)) {
+
+            VerificationCode verificationCode = null;
+            if ((verificationCode = verificationCodeService.findVerificationCodeByPhone(phone)) == null) {
+                verificationCode = new VerificationCode();
+            }
+            verificationCode.setCode(code);
+            verificationCode.setExpired(LocalDateTime.now().plusMinutes(15L));
+            verificationCode.setPhone(phone);
+            verificationCode.setRegistered(0);
+            verificationCodeService.saveOrUpdateVerificationCode(verificationCode);
+        } else {
+            return Mono.error(new RuntimeException("短信发送失败！"));
+        }
+
+
+        return Mono.empty();
+    }
 
 }
