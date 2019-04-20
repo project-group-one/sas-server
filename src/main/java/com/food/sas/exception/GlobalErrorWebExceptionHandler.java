@@ -1,3 +1,4 @@
+/*
 package com.food.sas.exception;
 
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
@@ -38,4 +39,4 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(BodyInserters.fromObject(errorPropertiesMap));
     }
-}
+}*/

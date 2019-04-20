@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ZeroCopyHttpOutputMessage;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -26,7 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Random;
+import java.util.UUID;
 
 /**
  * Created by zj on 2018/12/20
@@ -44,12 +45,19 @@ public class FileController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaseResult uploadFile(@RequestPart("file") FilePart filePart) throws IOException {
         String extension = FilenameUtils.getExtension(filePart.filename());
-        Path path = Files.createTempFile(String.valueOf(new Random().nextInt(1000)), "." + extension);
-        log.info(path.toString());
-        AsynchronousFileChannel channel = AsynchronousFileChannel.open(path, StandardOpenOption.WRITE);
+        File classPath = new File(ResourceUtils.getURL("classpath:static").getPath());
+
+        Path path = Paths.get(classPath.getAbsolutePath() + "/upload/");
+        if (!Files.exists(path)) {
+            Files.createDirectories(path);
+        }
+        Path file = Files.createFile(Paths.get(path + "/" + UUID.randomUUID().toString() + "." + extension));
+
+        log.info(file.toString());
+        AsynchronousFileChannel channel = AsynchronousFileChannel.open(file, StandardOpenOption.WRITE);
         DataBufferUtils.write(filePart.content(), channel, 0).subscribe();
-        String url = path.getFileName().toString();
-        String prefix = path.toString().replace(url, "");
+        String url = file.getFileName().toString();
+        String prefix = file.toString().replace(url, "");
         fileRepository.save(FileInfo.builder().name(filePart.filename()).path(url).prefix(prefix).build());
         return new BaseResult<>(url);
     }

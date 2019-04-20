@@ -3,7 +3,6 @@ package com.food.sas.controller;
 import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.CommentRequest;
 import com.food.sas.data.dto.NewsDTO;
-import com.food.sas.data.dto.UserDTO;
 import com.food.sas.service.INewsService;
 import com.food.sas.service.IUserService;
 import io.swagger.annotations.Api;
@@ -11,8 +10,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +19,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -39,7 +37,7 @@ public class NewsController {
 
     @ApiOperation("获得单个新闻内容")
     @GetMapping("/{id}")
-    public BaseResult<?> getNewsById(@PathVariable Long id) throws IOException {
+    public BaseResult<NewsDTO> getNewsById(@PathVariable Long id) throws IOException {
         NewsDTO dto = newsService.getNewsById(id);
         if (dto.getStoreUrl() != null) {
             Path path = Paths.get(dto.getStoreUrl());
@@ -48,13 +46,13 @@ public class NewsController {
                 dto.setContent(new String(data));
             }
         }
-        return new BaseResult(dto);
+        return new BaseResult<>(dto);
     }
 
     @ApiOperation("获取新闻资讯列表")
     @GetMapping
-    public BaseResult<?> getNewsList(NewsDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
-                                     @RequestParam(value = "size", defaultValue = "20") int size) {
+    public BaseResult<List<NewsDTO>> getNewsList(NewsDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
+                                                 @RequestParam(value = "size", defaultValue = "20") int size) {
         Page<NewsDTO> result = newsService.getNewsList(dto, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));
         return new BaseResult<>(result.getContent(), result);
     }
@@ -62,7 +60,7 @@ public class NewsController {
 
     @ApiOperation("新增新闻")
     @PostMapping
-    public Mono<?> releaseNews(@RequestBody NewsDTO body) throws IOException {
+    public Mono<Void> releaseNews(@RequestBody NewsDTO body) throws IOException {
         Path data = FileSystems.getDefault().getPath("/data", UUID.randomUUID().toString() + ".md");
         Files.createFile(data);
         Files.write(data, body.getContent().getBytes());
@@ -74,7 +72,7 @@ public class NewsController {
 
     @ApiOperation("修改新闻内容")
     @PutMapping("/{id}")
-    public Mono<?> updateNews(@RequestBody NewsDTO body, @PathVariable Long id) throws IOException {
+    public Mono<Void> updateNews(@RequestBody NewsDTO body, @PathVariable Long id) throws IOException {
         Path old = Paths.get(body.getStoreUrl());
         Files.write(old, body.getContent().getBytes());
         newsService.saveNews(body);
@@ -83,7 +81,7 @@ public class NewsController {
 
     @ApiOperation("删除新闻")
     @DeleteMapping("/{id}")
-    public Mono<?> deleteNews(@PathVariable Long id) throws IOException {
+    public Mono<Void> deleteNews(@PathVariable Long id) throws IOException {
         NewsDTO dto = newsService.getNewsById(id);
         if (dto.getStoreUrl() != null) {
             Path deleteFile = Paths.get(dto.getStoreUrl());
@@ -96,11 +94,7 @@ public class NewsController {
     }
 
     @PostMapping("/comments")
-    public Mono<Void> createComment(@RequestBody @Valid CommentRequest request,
-                                    Authentication authentication) {
-        UserDTO userDTO = userService.findUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername());
-        request.setUserId(userDTO.getId());
-        request.setUserName(userDTO.getName());
+    public Mono<Void> createComment(@RequestBody @Valid CommentRequest request) {
         return newsService.createComment(request);
     }
 }

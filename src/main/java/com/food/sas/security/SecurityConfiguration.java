@@ -25,7 +25,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.DelegatingServerAuthenticationSuccessHandler;
-import org.springframework.security.web.server.authentication.HttpBasicServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 
@@ -111,7 +110,7 @@ public class SecurityConfiguration {
                 .pathMatchers("/api/user/phone").permitAll()
                 .pathMatchers("/auth/**").permitAll()
 //                .pathMatchers( "/druid/*").permitAll()
-                .pathMatchers("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**").permitAll()
+                .pathMatchers("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**", "/api/files").permitAll()
                 .anyExchange().authenticated()
                 .and()
                 .csrf().disable().securityContextRepository(repository);
