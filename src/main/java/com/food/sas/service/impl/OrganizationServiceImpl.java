@@ -35,6 +35,11 @@ public class OrganizationServiceImpl implements IOrganizationService {
     private EntityManager em;
 
     @Override
+    public OrganizationDTO searchOrganization(Long id) {
+        return Mappers.getMapper(OrganizationMapper.class).fromEntity(organizationRepository.findById(id).get());
+    }
+
+    @Override
     public Page<OrganizationDTO> searchOrganization(String name, Pageable pageable) {
         QOrganization qOrganization = QOrganization.organization;
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);

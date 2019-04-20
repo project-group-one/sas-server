@@ -21,4 +21,6 @@ public class OrganizationDTO implements Serializable {
 
     private Long creator;
 
+    private UserDTO user;
+
 }

@@ -108,7 +108,7 @@ public class UserServiceImpl implements IUserService {
         //被更改的用户
         Optional<User> user2 = userRepository.findById(mId);
 
-        if (user1.isPresent() && user2.isPresent() && user1.get().getType() > user2.get().getType()) {
+        if (user1.isPresent() && user2.isPresent() && user1.get().getType() >= user2.get().getType()) {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;

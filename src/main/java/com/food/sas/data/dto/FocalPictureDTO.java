@@ -24,4 +24,8 @@ public class FocalPictureDTO implements Serializable {
     private Date createDate;
 
     private Long creator;
+
+    private Integer hidden;
+
+    private Integer order;
 }

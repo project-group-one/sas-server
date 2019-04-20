@@ -15,13 +15,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -57,11 +64,12 @@ public class UserController {
 
     @ApiOperation("登录后调用 获取必要参数")
     @GetMapping("/current")
-    public Mono<?> getCurrentUser(Authentication authentication) {
-        if (authentication.isAuthenticated()) {
+    public Mono<?> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
+        if (authentication != null && authentication.isAuthenticated()) {
             return Mono.just(userService.findUserByUsername(authentication.getName()));
         }
-        return Mono.error(new AccessDeniedException("illegal operation"));
+        exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+        return Mono.just("用户未登录");
     }
 
     //    @PreAuthorize("hasRole('ADMIN')")
@@ -198,6 +206,23 @@ public class UserController {
 
 
         return Mono.empty();
+    }
+
+    @ApiOperation("修改密码")
+    @PutMapping("/pwd")
+    public Mono<?> modifyPassword(Authentication authentication, @RequestParam String oPwd, @RequestParam String nPwd) {
+        if (authentication.isAuthenticated()) {
+            //判断旧密码是否相同
+            UserDTO user = userService.findUserByUsername(authentication.getName());
+            boolean b = encoder.matches(oPwd, user.getPassword().substring(5));
+            if (b) {
+                user.setPassword(SALT + encoder.encode(nPwd));
+                userService.createUser(user);
+                return userDetailsService.updatePassword(new com.food.sas.security.User(user.getId(), user.getType(), user.getUsername(), user.getPassword().substring(5), AuthorityUtils.createAuthorityList(user.getRole().split(","))), user.getPassword().substring(5));
+            }
+        }
+
+        return Mono.error(new RuntimeException("修改密码失败"));
     }
 
 }

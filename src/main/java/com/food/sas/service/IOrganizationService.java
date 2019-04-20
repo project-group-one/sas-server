@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
  */
 public interface IOrganizationService {
 
+    OrganizationDTO searchOrganization(Long id);
+
     Page<OrganizationDTO> searchOrganization(String name, Pageable pageable);
 
     void createOrganization(OrganizationDTO dto);

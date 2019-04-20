@@ -31,6 +31,11 @@ public class OrganizationController {
     @Autowired
     private IUserService userService;
 
+    @ApiOperation("根据id查询组织")
+    @GetMapping("/{id}")
+    public Mono<?> searchOrganization(@PathVariable Long id) {
+        return Mono.just(service.searchOrganization(id));
+    }
     @ApiOperation("查询组织")
     @GetMapping
     public BaseResult<List<OrganizationDTO>> searchOrganization(@RequestParam(required = false) String name, @RequestParam(value = "current", defaultValue = "1") int page,

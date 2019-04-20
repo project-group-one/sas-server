@@ -32,4 +32,8 @@ public class FocalPicture {
 
     @CreatedBy
     private Long creator;
+
+    private Integer hidden;
+
+    private Integer order;
 }

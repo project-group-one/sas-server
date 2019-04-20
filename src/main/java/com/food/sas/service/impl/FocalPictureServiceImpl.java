@@ -52,6 +52,8 @@ public class FocalPictureServiceImpl implements IFocalPictureService {
 
     @Override
     public void createFocalPicture(FocalPictureDTO dto) {
+        dto.setHidden(0);
+        dto.setOrder(-1);
         focalPictureRepository.saveAndFlush(Mappers.getMapper(FocalPictureMapper.class).toEntity(dto));
     }
 
@@ -60,6 +62,14 @@ public class FocalPictureServiceImpl implements IFocalPictureService {
         focalPictureRepository.findById(id).ifPresent(focalPicture -> {
             if (StringUtils.isNotEmpty(dto.getImgUrl())) {
                 focalPicture.setImgUrl(dto.getImgUrl());
+            }
+
+            if (dto.getHidden() != null) {
+                focalPicture.setHidden(dto.getHidden());
+            }
+
+            if (dto.getOrder() != null) {
+                focalPicture.setOrder(dto.getOrder());
             }
 
             if (StringUtils.isNotEmpty(dto.getName())) {

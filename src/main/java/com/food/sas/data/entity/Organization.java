@@ -32,5 +32,9 @@ public class Organization implements Serializable {
     @CreatedBy
     private Long creator;
 
+    @OneToOne
+    @JoinColumn(name = "creator", updatable = false, insertable = false)
+    private User user;
+
 
 }
