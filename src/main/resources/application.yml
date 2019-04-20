@@ -8,6 +8,8 @@ spring:
     url: jdbc:mysql://39.98.172.236:3306/sas?useUnicode=true&connectTimeout=2000&socketTimeout=6000&rewriteBatchedStatements=TRUE&serverTimezone=Hongkong
     username: root
     password: 123456
+    hikari:
+      maximum-pool-size: 5
   jpa:
     show-sql: true
     generate-ddl: true
