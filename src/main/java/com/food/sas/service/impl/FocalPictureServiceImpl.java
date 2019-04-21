@@ -8,7 +8,6 @@ import com.food.sas.mapper.FocalPictureMapper;
 import com.food.sas.service.IFocalPictureService;
 import com.querydsl.core.BooleanBuilder;
 import org.apache.commons.lang3.StringUtils;
-import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -53,8 +52,9 @@ public class FocalPictureServiceImpl implements IFocalPictureService {
     @Override
     public void createFocalPicture(FocalPictureDTO dto) {
         dto.setHidden(0);
-        dto.setOrder(-1);
-        focalPictureRepository.saveAndFlush(Mappers.getMapper(FocalPictureMapper.class).toEntity(dto));
+        dto.setOrdered(-1);
+        FocalPicture focalPicture = FocalPictureMapper.MAPPER.toEntity(dto);
+        focalPictureRepository.save(focalPicture);
     }
 
     @Override
@@ -68,8 +68,8 @@ public class FocalPictureServiceImpl implements IFocalPictureService {
                 focalPicture.setHidden(dto.getHidden());
             }
 
-            if (dto.getOrder() != null) {
-                focalPicture.setOrder(dto.getOrder());
+            if (dto.getOrdered() != null) {
+                focalPicture.setOrdered(dto.getOrdered());
             }
 
             if (StringUtils.isNotEmpty(dto.getName())) {

@@ -27,5 +27,5 @@ public class FocalPictureDTO implements Serializable {
 
     private Integer hidden;
 
-    private Integer order;
+    private Integer ordered;
 }

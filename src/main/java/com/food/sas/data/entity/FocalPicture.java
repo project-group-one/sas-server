@@ -35,5 +35,5 @@ public class FocalPicture {
 
     private Integer hidden;
 
-    private Integer order;
+    private Integer ordered;
 }

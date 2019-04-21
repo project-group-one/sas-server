@@ -3,6 +3,7 @@ package com.food.sas.mapper;
 import com.food.sas.data.dto.FocalPictureDTO;
 import com.food.sas.data.entity.FocalPicture;
 import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
@@ -11,6 +12,8 @@ import java.util.List;
  */
 @Mapper
 public interface FocalPictureMapper {
+
+    FocalPictureMapper MAPPER = Mappers.getMapper(FocalPictureMapper.class);
 
     FocalPicture toEntity(FocalPictureDTO dto);
 
