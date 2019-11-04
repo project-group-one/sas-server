@@ -26,6 +26,9 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 /**
  * @author Created by ygdxd_admin at 2019-01-14 10:03 PM
  */
@@ -79,7 +82,7 @@ public class TokenEndpoint {
                 UserDTO userDTO = userService.findUserByUsername(body.getUsername());
                 return JwtBody.newBuiler()
                         .setAccessToken(JwtHelper.encode(JSON.toJSONString(userDetails), SecurityConfiguration.HMAC).getEncoded())
-                        .setExpired(3600L)
+                        .setExpired(3600L + LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli())
                         .setRefreshToken(null)
                         .setUserId(userDTO.getId())
                         .setUserType(userDTO.getType()).builde();

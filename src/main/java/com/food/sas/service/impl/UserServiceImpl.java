@@ -30,14 +30,6 @@ public class UserServiceImpl implements IUserService {
 
     private static final int FREEZED_STATUS = 1;
 
-    private static final String ROLE_ADMIN = "ADMIN";
-    private static final int ROLE_ADMIN_I = 4;
-    private static final String ROLE_NORMAL = "NORMAL";
-    private static final int ROLE_NORMAL_I = 2;
-    private static final String ROLE_GUEST = "GUEST";
-    private static final int ROLE_GUEST_I = 1;
-    private static final String ROLE_ALL = "ALL";
-
     @Autowired
     private UserRepository userRepository;
 
@@ -136,14 +128,19 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void changeRole(Long mId, Integer role) {
-        userRepository.findById(mId).ifPresent(user -> {
-            user.setRole(getRole(role));
-            userRepository.saveAndFlush(user);
-        });
+    public String changeRole(Long mId, String role) {
+        Optional<User> user = userRepository.findById(mId);
+        if (user.isPresent()) {
+            user.get().setRole(role);
+            userRepository.saveAndFlush(user.get());
+            return user.get().getUsername();
+        }
+        return null;
     }
 
-    private String getRole(int role) {
-        return (role & ROLE_ADMIN_I) == ROLE_ADMIN_I ? ROLE_ADMIN : (role & ROLE_NORMAL_I) == ROLE_NORMAL_I ? ROLE_NORMAL : ROLE_GUEST;
+    @Override
+    public UserDTO searchUserById(Long id) {
+        return Mappers.getMapper(UserMapper.class).fromEntity(userRepository.findById(id).get());
     }
+
 }

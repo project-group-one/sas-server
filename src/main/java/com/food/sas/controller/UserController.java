@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -47,6 +49,15 @@ public class UserController {
 
     private static final String PHONE_REGEX = "^((13[0-9])|(14[5,7,9])|(15[0-3,5-9])|(166)|(17[3,5,6,7,8])|(18[0-9])|(19[8,9]))\\d{8}$";
 
+
+    private static final String ROLE_ADMIN = "ADMIN";
+    private static final int ROLE_ADMIN_I = 4;
+    private static final String ROLE_NORMAL = "CLIENT";
+    private static final int ROLE_NORMAL_I = 2;
+    private static final String ROLE_GUEST = "GUEST";
+    private static final int ROLE_GUEST_I = 1;
+    private static final String ROLE_ALL = "ALL";
+
     @Autowired
     private PasswordEncoder encoder;
 
@@ -62,6 +73,18 @@ public class UserController {
     @Autowired
     private SmsSender sender;
 
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @ApiOperation("根据id查询")
+    @GetMapping("/{id}")
+    public Mono<?> searchUser(@PathVariable Long id, @ApiIgnore Authentication authentication, @ApiIgnore ServerWebExchange exchange) {
+        if (authentication == null && !authentication.isAuthenticated()) {
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            return Mono.just("用户未登录");
+        }
+        return Mono.just(userService.searchUserById(id));
+    }
+
     @ApiOperation("登录后调用 获取必要参数")
     @GetMapping("/current")
     public Mono<?> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
@@ -72,7 +95,7 @@ public class UserController {
         return Mono.just("用户未登录");
     }
 
-    //    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("用户列表查询 查询参数 username(半模糊) address type name(半模糊)")
     @GetMapping
     public BaseResult<List<UserDTO>> getUserPages(UserDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
@@ -81,7 +104,7 @@ public class UserController {
         return new BaseResult<>(result.getContent(), result);
     }
 
-    //    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("添加用户")
     @PostMapping
     public Mono<?> registeredUser(@ApiParam(value = "创建用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id, @RequestBody UserDTO dto) {
@@ -102,6 +125,7 @@ public class UserController {
         return Mono.empty();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("修改用户")
     @PutMapping("/{mId}")
     public Mono<?> modifyManager(@RequestBody UserDTO dto,
@@ -117,6 +141,7 @@ public class UserController {
         return Mono.empty();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("冻结用户")
     @PostMapping("/{mId}/freeze")
     public Mono<?> freezeUser(@ApiParam(value = "冻结用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id,
@@ -129,6 +154,7 @@ public class UserController {
     }
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("删除管理员")
     @DeleteMapping
     public Mono<?> deleteUser(@ApiParam("id以逗号分隔") @RequestParam Long[] ids,
@@ -142,6 +168,7 @@ public class UserController {
         return Mono.empty();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("修改用户权限")
     @PutMapping("/{mId}/freeze")
     public Mono<?> changeRole(@PathVariable Long mId,
@@ -150,7 +177,11 @@ public class UserController {
         if (!userService.validateById(id, mId)) {
             return Mono.error(new IllegalArgumentException("no access"));
         }
-        userService.changeRole(mId, role);
+        String r = getRole(role);
+        String s = userService.changeRole(mId, r);
+        if (s != null) {
+//            userDetailsService.changeRole(s, r);
+        }
         return Mono.empty();
     }
 
@@ -223,6 +254,21 @@ public class UserController {
         }
 
         return Mono.error(new RuntimeException("修改密码失败"));
+    }
+
+
+    private String getRole(int role) {
+        StringBuilder builder = new StringBuilder();
+        if ((role & ROLE_ADMIN_I) == ROLE_ADMIN_I) {
+            builder.append(",").append(ROLE_ADMIN);
+        } else {
+            if ((role & ROLE_NORMAL_I) == ROLE_NORMAL_I) {
+                builder.append(",").append(ROLE_NORMAL);
+            } else {
+                builder.append(",").append(ROLE_GUEST);
+            }
+        }
+        return builder.substring(1).toString();
     }
 
 }

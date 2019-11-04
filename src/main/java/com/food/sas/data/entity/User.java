@@ -47,8 +47,9 @@ public class User implements Serializable {
     @CreatedDate
     private LocalDateTime createDate;
 
-    private Integer orgizationId;
-
     private Integer status;
+
+    @OneToOne(cascade = CascadeType.PERSIST, mappedBy = "user")
+    private Organization organization;
 
 }

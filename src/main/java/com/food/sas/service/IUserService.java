@@ -25,5 +25,7 @@ public interface IUserService {
 
     void freezeUser(Long id);
 
-    void changeRole(Long mId, Integer role);
+    String changeRole(Long mId, String role);
+
+    UserDTO searchUserById(Long id);
 }
