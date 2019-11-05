@@ -53,7 +53,6 @@ public class MyMapReactiveUserDetailsService
      * @param users the {@link UserDetails} to use
      */
     public MyMapReactiveUserDetailsService(Collection<UserDetails> users) {
-        Assert.notEmpty(users, "users cannot be null or empty");
         this.users = users.stream().collect(Collectors.toConcurrentMap(u -> getKey(u.getUsername()), Function.identity()));
     }
 
