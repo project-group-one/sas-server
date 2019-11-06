@@ -87,7 +87,7 @@ public class TokenEndpoint {
                         .setUserId(userDTO.getId())
                         .setUserType(userDTO.getType()).builde();
             });
-        });
+        }).onErrorReturn("账号或密码错误");
 //        userDetailsService.findByUsername(body.getUsername()).map(userDetails -> {
 //            System.out.println(JSON.toJSONString(userDetails));
 //            UserDTO userDTO = userService.findUserByUsername(body.getUsername());
