@@ -1,5 +1,6 @@
 package com.food.sas.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.food.sas.util.TreeNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,8 +15,10 @@ import java.util.List;
 @Setter
 public class FoodTypeModel implements TreeNode<Long> {
 
+    @JsonProperty(value = "key")
     private Long id;
 
+    @JsonProperty(value = "title")
     private String name;
 
     private Long parentId;

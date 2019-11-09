@@ -37,4 +37,5 @@ public class BaseResult<T> {
     public BaseResult(T data) {
         this.data = data;
     }
+
 }

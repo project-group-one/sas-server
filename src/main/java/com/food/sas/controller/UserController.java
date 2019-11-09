@@ -98,10 +98,10 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("用户列表查询 查询参数 username(半模糊) address type name(半模糊)")
     @GetMapping
-    public BaseResult<List<UserDTO>> getUserPages(UserDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
-                                                  @RequestParam(value = "size", defaultValue = "20") int size) {
+    public Mono<BaseResult<List<UserDTO>>> getUserPages(UserDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
+                                                        @RequestParam(value = "size", defaultValue = "20") int size) {
         Page<UserDTO> result = userService.getUserPage(dto, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));
-        return new BaseResult<>(result.getContent(), result);
+        return Mono.just(new BaseResult<>(result.getContent(), result));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

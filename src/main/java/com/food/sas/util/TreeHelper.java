@@ -14,7 +14,7 @@ public class TreeHelper {
      * @param nodes    数据
      * @return list
      */
-    public static <ID extends Serializable, T extends TreeNode<ID>> List<T> buildTree(ID parentID, List<T> nodes) {
+    public static <ID extends Number, T extends TreeNode<ID>> List<T> buildTree(ID parentID, List<T> nodes) {
         // 根节点列表
         List<T> list = new ArrayList<>();
         // 顺序遍历节点列表，如果之前是有序的，那么构建树后同层级之间有序

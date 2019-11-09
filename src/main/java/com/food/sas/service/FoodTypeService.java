@@ -43,7 +43,7 @@ public class FoodTypeService {
     public Flux<FoodTypeModel> queryFoodType() {
         List<FoodType> foodTypes = foodTypeRepository.findAll();
         List<FoodTypeModel> foodTypeModels = FoodTypeMapper.MAPPER.toModels(foodTypes);
-        List<FoodTypeModel> typeModels = TreeHelper.buildTree(null, foodTypeModels);
+        List<FoodTypeModel> typeModels = TreeHelper.buildTree(-1L, foodTypeModels);
         return Flux.fromIterable(typeModels);
     }
 }

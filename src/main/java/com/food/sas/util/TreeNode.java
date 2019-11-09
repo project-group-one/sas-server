@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by zj on 2019/1/6
  */
-public interface TreeNode<ID extends Serializable> {
+public interface TreeNode<ID extends Number> {
 
     ID getId();
 

@@ -36,4 +36,6 @@ public class FocalPicture {
     private Integer hidden;
 
     private Integer ordered;
+
+    private String url;
 }
