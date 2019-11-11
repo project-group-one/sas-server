@@ -5,11 +5,11 @@ spring:
   application:
     name: food-sas-service
   datasource:
-    url: jdbc:mysql://192.168.0.144:3306/sas?useUnicode=true&connectTimeout=2000&socketTimeout=6000&rewriteBatchedStatements=TRUE&serverTimezone=Hongkong
-    username: kinsey
-    password: Food7890
+    url: jdbc:mysql://127.0.0.1:3306/sas?useUnicode=true&connectTimeout=2000&socketTimeout=6000&rewriteBatchedStatements=TRUE&serverTimezone=Hongkong
+    username: food
+    password: food@2019
     hikari:
-      maximum-pool-size: 5
+      maximum-pool-size: 20
   jpa:
     show-sql: true
     generate-ddl: true

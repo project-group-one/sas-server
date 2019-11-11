@@ -20,7 +20,7 @@ public class FoodRegulation {
      * 适用范围
      */
     @Column
-    private String range;
+    private String ranged;
 
     /**
      * 产品种类
