@@ -46,4 +46,14 @@ public class FoodTypeService {
         List<FoodTypeModel> typeModels = TreeHelper.buildTree(-1L, foodTypeModels);
         return Flux.fromIterable(typeModels);
     }
+
+    public Mono<Long> modifyFoodType(FoodTypeRequest body) {
+        Optional<FoodType> typeOptional = foodTypeRepository.findById(body.getId());
+        if (typeOptional.isPresent()) {
+            FoodType entity = typeOptional.get();
+            entity.setName(body.getName());
+            return Mono.just(foodTypeRepository.saveAndFlush(entity).getId());
+        }
+        return Mono.just(body.getId());
+    }
 }

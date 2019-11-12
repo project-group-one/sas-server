@@ -30,4 +30,10 @@ public class FoodTypeController {
     public Flux<FoodTypeModel> queryFoodType() {
         return foodTypeService.queryFoodType();
     }
+
+    @ApiOperation("修改食品树")
+    @PutMapping("/{id}")
+    public Mono<Long> modifyFoodType(@RequestBody FoodTypeRequest body) {
+        return foodTypeService.modifyFoodType(body);
+    }
 }

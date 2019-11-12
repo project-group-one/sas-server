@@ -1,5 +1,6 @@
 package com.food.sas.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +11,11 @@ import lombok.Setter;
 @Setter
 public class FoodTypeRequest {
 
+    @JsonProperty("title")
     private String name;
 
     private Long parentId;
+
+    @JsonProperty("key")
+    private Long id;
 }
