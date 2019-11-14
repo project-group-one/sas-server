@@ -31,7 +31,8 @@ spring:
     # static-locations: ["classpath:/static/upload/"]
   # webflux:
   #   static-path-pattern: /uploads/**
-
+  main:
+    allow-bean-definition-overriding: true
 
 swagger:
   groupName: 'sas-service-api'
