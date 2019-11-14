@@ -1,7 +1,10 @@
 package com.food.sas.controller;
 
+import com.food.sas.data.dto.AddUserToOrganizationRequest;
 import com.food.sas.data.dto.BaseResult;
+import com.food.sas.data.dto.CreateOrganizationRequest;
 import com.food.sas.data.dto.OrganizationDTO;
+import com.food.sas.enums.StatusEnum;
 import com.food.sas.service.IOrganizationService;
 import com.food.sas.service.IUserService;
 import io.swagger.annotations.Api;
@@ -15,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -36,35 +40,51 @@ public class OrganizationController {
     public Mono<?> searchOrganization(@PathVariable Long id) {
         return Mono.just(service.searchOrganization(id));
     }
+
     @ApiOperation("查询组织")
     @GetMapping
     public BaseResult<List<OrganizationDTO>> searchOrganization(@RequestParam(required = false) String name, @RequestParam(value = "current", defaultValue = "1") int page,
                                                                 @RequestParam(value = "size", defaultValue = "20") int size) {
 
-        Page<OrganizationDTO> result = service.searchOrganization(name, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));
+        Page<OrganizationDTO> result = service.searchOrganization(name, PageRequest.of(Math.max(page - 1, 0), size));
         return new BaseResult<>(result.getContent(), result);
     }
 
     @ApiOperation("新增组织")
     @PostMapping
-    public Mono<?> createOrganization(@RequestBody OrganizationDTO body, Authentication authentication) {
-        body.setCreator(userService.findUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername()).getId());
-        service.createOrganization(body);
+    public Mono<Void> createOrganization(@RequestBody @Valid CreateOrganizationRequest body, Authentication authentication) {
+        Long creator = userService.findUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername()).getId();
+        service.createOrganization(body, creator);
         return Mono.empty();
     }
 
     @ApiOperation("修改组织")
     @PutMapping("/{id}")
-    public Mono<?> modifyOrganization(@PathVariable Long id, @RequestBody OrganizationDTO body) {
+    public Mono<Void> modifyOrganization(@PathVariable Long id, @RequestBody CreateOrganizationRequest body) {
         service.modifyOrganization(body, id);
         return Mono.empty();
     }
 
     @ApiOperation("删除组织")
-    public Mono<?> deleteOrganization(@ApiParam("ids") @RequestParam Long[] ids) {
-        service.batchDeleteOrganization(ids);
+    @DeleteMapping("/{id}")
+    public Mono<Void> deleteOrganization(@ApiParam("ids") @PathVariable("id") Long id) {
+        service.batchDeleteOrganization(id);
         return Mono.empty();
     }
 
+    @ApiOperation("向组织里面添加成员")
+    @PostMapping("/users")
+    public Mono<Void> addUserToOrganization(@RequestBody @Valid AddUserToOrganizationRequest request) {
+        service.addUserToOrganization(request);
+        return Mono.empty();
+    }
+
+    @PutMapping("/{id}/audit")
+    public Mono<Void> auditOrganization(@PathVariable("id") Long id,
+                                        @RequestParam("status") StatusEnum status,
+                                        @RequestParam("errorMsg") String errorMsg) {
+        service.auditOrganization(id, status, errorMsg);
+        return Mono.empty();
+    }
 
 }

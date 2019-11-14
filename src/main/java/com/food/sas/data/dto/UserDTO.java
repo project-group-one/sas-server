@@ -47,7 +47,4 @@ public class UserDTO implements Serializable {
 
     @ApiModelProperty("地址")
     private String address;
-
-    @ApiModelProperty(value = "组织信息", hidden = true)
-    private OrganizationDTO organization;
 }

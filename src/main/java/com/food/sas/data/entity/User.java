@@ -49,7 +49,7 @@ public class User implements Serializable {
 
     private Integer status;
 
-    @OneToOne(cascade = CascadeType.PERSIST, mappedBy = "user")
+    @ManyToOne(fetch = FetchType.LAZY)
     private Organization organization;
 
 }
