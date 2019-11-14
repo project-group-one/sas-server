@@ -1,6 +1,10 @@
 package com.food.sas.data.entity;
 
+import com.food.sas.enums.StatusEnum;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -8,6 +12,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author Created by ygdxd_admin at 2019-01-06 8:05 PM
@@ -15,6 +21,9 @@ import java.time.LocalDateTime;
 @Table(name = "t_organization")
 @Entity
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Organization implements Serializable {
 
@@ -26,15 +35,20 @@ public class Organization implements Serializable {
 
     private String name;
 
+    private String credential;
+
+    @Enumerated(EnumType.STRING)
+    private StatusEnum status;
+
+    private String errorMsg;
+
     @CreatedDate
     private LocalDateTime createDate;
 
     @CreatedBy
     private Long creator;
 
-    @OneToOne
-    @JoinColumn(name = "creator", updatable = false, insertable = false)
-    private User user;
-
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<User> users = new LinkedHashSet<>();
 
 }
