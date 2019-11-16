@@ -1,6 +1,5 @@
 package com.food.sas.service.impl;
 
-import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraph;
 import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphUtils;
 import com.food.sas.data.dto.AddUserToOrganizationRequest;
 import com.food.sas.data.dto.CreateOrganizationRequest;
@@ -22,7 +21,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityManager;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -118,8 +114,8 @@ public class OrganizationServiceImpl implements IOrganizationService {
             throw new BadException("该用户不存在");
         }
         Organization organization = organizationOptional.get();
-        organization.getUsers().addAll(users);
         users.forEach(o -> o.setOrganization(organization));
+        organization.getUsers().addAll(users);
         organizationRepository.save(organization);
     }
 
