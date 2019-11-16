@@ -25,6 +25,12 @@ public class FoodTypeController {
         return foodTypeService.createFoodType(request);
     }
 
+    @GetMapping("/count")
+    public Flux<String> countFoodType() {
+        return Flux.just("1");
+    }
+
+
     @ApiOperation("食品类别树")
     @GetMapping
     public Flux<FoodTypeModel> queryFoodType() {
