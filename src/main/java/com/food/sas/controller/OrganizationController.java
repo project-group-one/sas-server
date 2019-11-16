@@ -83,7 +83,7 @@ public class OrganizationController {
     @PutMapping("/{id}/audit")
     public Mono<Void> auditOrganization(@PathVariable("id") Long id,
                                         @RequestParam("status") StatusEnum status,
-                                        @RequestParam("errorMsg") String errorMsg) {
+                                        @RequestParam(value = "errorMsg", required = false) String errorMsg) {
         service.auditOrganization(id, status, errorMsg);
         return Mono.empty();
     }
