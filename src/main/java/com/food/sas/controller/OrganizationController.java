@@ -79,6 +79,7 @@ public class OrganizationController {
         return Mono.empty();
     }
 
+    @ApiOperation("组织审核")
     @PutMapping("/{id}/audit")
     public Mono<Void> auditOrganization(@PathVariable("id") Long id,
                                         @RequestParam("status") StatusEnum status,
@@ -86,5 +87,4 @@ public class OrganizationController {
         service.auditOrganization(id, status, errorMsg);
         return Mono.empty();
     }
-
 }

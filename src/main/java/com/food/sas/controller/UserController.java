@@ -257,6 +257,13 @@ public class UserController {
         return Mono.error(new RuntimeException("修改密码失败"));
     }
 
+    @ApiOperation("获取没有组织的用户")
+    @GetMapping("/not-org")
+    public Mono<BaseResult<List<UserDTO>>> getUsersHasNotOrg() {
+        List<UserDTO> users = userService.getUsersHasNoOrg();
+        return Mono.just(new BaseResult<>(users));
+    }
+
 
     private String getRole(int role) {
         StringBuilder builder = new StringBuilder();

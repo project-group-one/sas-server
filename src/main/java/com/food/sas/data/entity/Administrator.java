@@ -20,7 +20,10 @@ public class Administrator implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
+
+    @Version
+    private Long version;
 
     private String username;
 

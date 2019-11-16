@@ -20,7 +20,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Created by ygdxd_admin at 2018-12-25 7:59 PM
@@ -141,6 +143,12 @@ public class UserServiceImpl implements IUserService {
     @Override
     public UserDTO searchUserById(Long id) {
         return Mappers.getMapper(UserMapper.class).fromEntity(userRepository.findById(id).get());
+    }
+
+    @Override
+    public List<UserDTO> getUsersHasNoOrg() {
+        return userRepository.findAll().parallelStream().filter(o -> Objects.isNull(o.getOrganization()))
+                .map(o -> Mappers.getMapper(UserMapper.class).fromEntity(o)).collect(Collectors.toList());
     }
 
 }

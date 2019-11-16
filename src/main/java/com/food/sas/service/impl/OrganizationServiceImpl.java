@@ -106,14 +106,13 @@ public class OrganizationServiceImpl implements IOrganizationService {
         if (!organizationOptional.isPresent()) {
             throw new BadException("该组织不存在");
         }
-        Optional<User> userOptional = userRepository.findById(request.getUserId());
-        if (!userOptional.isPresent()) {
+        List<User> users = userRepository.findByIdIn(request.getUserIds());
+        if (CollectionUtils.isEmpty(users)) {
             throw new BadException("该用户不存在");
         }
         Organization organization = organizationOptional.get();
-        User user = userOptional.get();
-        organization.getUsers().add(user);
-        user.setOrganization(organization);
+        organization.getUsers().addAll(users);
+        users.forEach(o -> o.setOrganization(organization));
         organizationRepository.save(organization);
     }
 
