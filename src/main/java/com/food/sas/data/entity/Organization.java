@@ -25,7 +25,16 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@NamedEntityGraphs({
+        @NamedEntityGraph(name = Organization.ALL,
+                attributeNodes = {
+                        @NamedAttributeNode(value = "users")
+                }
+        )
+})
 public class Organization implements Serializable {
+
+    public static final String ALL = "all";
 
     private static final long serialVersionUID = -2067391799785799688L;
 

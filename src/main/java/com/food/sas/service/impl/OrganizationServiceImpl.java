@@ -1,5 +1,7 @@
 package com.food.sas.service.impl;
 
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraph;
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphUtils;
 import com.food.sas.data.dto.AddUserToOrganizationRequest;
 import com.food.sas.data.dto.CreateOrganizationRequest;
 import com.food.sas.data.dto.OrganizationDTO;
@@ -49,7 +51,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
 
     @Override
     public OrganizationDTO searchOrganization(Long id) {
-        Optional<Organization> optional = organizationRepository.findById(id);
+        Optional<Organization> optional = organizationRepository.findById(id, EntityGraphUtils.fromName(Organization.ALL,true));
         if (!optional.isPresent()) {
             throw new BadException("不存该组织");
         }
