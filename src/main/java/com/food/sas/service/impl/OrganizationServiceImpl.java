@@ -51,7 +51,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
 
     @Override
     public OrganizationDTO searchOrganization(Long id) {
-        Optional<Organization> optional = organizationRepository.findById(id, EntityGraphUtils.fromName(Organization.ALL,true));
+        Optional<Organization> optional = organizationRepository.findById(id, EntityGraphUtils.fromName(Organization.ALL, true));
         if (!optional.isPresent()) {
             throw new BadException("不存该组织");
         }
@@ -109,7 +109,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
 
     @Override
     public void addUserToOrganization(AddUserToOrganizationRequest request) {
-        Optional<Organization> organizationOptional = organizationRepository.findById(request.getOrgId());
+        Optional<Organization> organizationOptional = organizationRepository.findById(request.getOrgId(), EntityGraphUtils.fromName(Organization.ALL, true));
         if (!organizationOptional.isPresent()) {
             throw new BadException("该组织不存在");
         }
