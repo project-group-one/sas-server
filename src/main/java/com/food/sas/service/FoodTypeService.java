@@ -35,6 +35,7 @@ public class FoodTypeService {
             foodType.setPath(path);
             foodTypeRepository.save(foodType);
         } else {
+            foodType.setLevel(1L);
             foodTypeRepository.save(foodType);
         }
         return Mono.empty();
