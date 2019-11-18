@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.jwt.JwtHelper;
@@ -53,7 +54,7 @@ public class TokenEndpoint {
     @ApiOperation("获取密钥 其实还是session登录 现在密钥还没卵用， 密码错误会报错")
     @PostMapping("/token")
     public Mono<?> getToken(@RequestBody UsernamePasswordRequest body, @ApiIgnore ServerWebExchange exchange) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(body.getUsername(), body.getPassword());
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(body.getUsername(), body.getPassword(), AuthorityUtils.createAuthorityList("ADMIN"));
         Mono<Authentication> authentication = reactiveAuthenticationManager.authenticate(token);
 //        SecurityContextImpl securityContext = new SecurityContextImpl();
 //        authentication.subscribe(securityContext::setAuthentication);

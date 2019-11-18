@@ -153,6 +153,15 @@ public class UserController {
         return Mono.empty();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @ApiOperation("解冻用户")
+    @PostMapping("/{mId}/thaw")
+    public Mono<?> thawUser(@ApiParam("需要解冻的用户id") @PathVariable Long mId) {
+        userService.thawUser(mId);
+        return Mono.empty();
+    }
+
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("删除管理员")

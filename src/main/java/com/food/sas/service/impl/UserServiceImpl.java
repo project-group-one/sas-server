@@ -143,4 +143,12 @@ public class UserServiceImpl implements IUserService {
         return Mappers.getMapper(UserMapper.class).fromEntity(userRepository.findById(id).get());
     }
 
+    @Override
+    public void thawUser(Long mId) {
+        userRepository.findById(mId).ifPresent(user -> {
+            user.setStatus(0);
+            userRepository.saveAndFlush(user);
+        });
+    }
+
 }

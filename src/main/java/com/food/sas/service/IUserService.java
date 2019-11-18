@@ -28,4 +28,6 @@ public interface IUserService {
     String changeRole(Long mId, String role);
 
     UserDTO searchUserById(Long id);
+
+    void thawUser(Long mId);
 }
