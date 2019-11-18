@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
  * @author Created by ygdxd_admin at 2019-11-11 8:49 PM
  */
 @Api("食品细则")
-@RequestMapping("/food/regulation")
+@RequestMapping("/api/food/regulation")
 @RestController
 public class FoodRegulationController {
 
@@ -25,9 +25,6 @@ public class FoodRegulationController {
     @GetMapping("/{id}")
     public Mono<?> searchFoodRegulation(@PathVariable Integer id) {
         FoodRegulationDTO result = foodRegulationService.getFoodRegulation(id);
-        if (result == null) {
-            return Mono.just(SimpleResponse.badRequest());
-        }
         return Mono.just(result);
     }
 
