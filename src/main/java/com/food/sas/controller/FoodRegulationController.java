@@ -2,6 +2,7 @@ package com.food.sas.controller;
 
 import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.FoodRegulationDTO;
+import com.food.sas.data.response.Result;
 import com.food.sas.data.response.SimpleResponse;
 import com.food.sas.service.IFoodRegulationService;
 import io.swagger.annotations.Api;
@@ -23,9 +24,9 @@ public class FoodRegulationController {
 
     @ApiOperation("获取食品细则详情")
     @GetMapping("/{id}")
-    public Mono<?> searchFoodRegulation(@PathVariable Integer id) {
+    public Mono<Result<FoodRegulationDTO>> searchFoodRegulation(@PathVariable Integer id) {
         FoodRegulationDTO result = foodRegulationService.getFoodRegulation(id);
-        return Mono.just(result);
+        return Mono.just(Result.ofSuccess(result));
     }
 
     @ApiOperation("增加食品细则")
