@@ -31,9 +31,9 @@ public class FoodRegulationController {
 
     @ApiOperation("增加食品细则")
     @PostMapping
-    public Mono<Integer> createFoodRegulation(@RequestBody FoodRegulationDTO body) {
+    public Mono<?> createFoodRegulation(@RequestBody FoodRegulationDTO body) {
         if (body.getTypeId() == null) {
-            return Mono.error(new RuntimeException("请指定食品类别"));
+            return Mono.just(Result.ofFail(400, "请指定食品类别"));
         }
         return Mono.just(foodRegulationService.createFoodRegulation(body));
     }
