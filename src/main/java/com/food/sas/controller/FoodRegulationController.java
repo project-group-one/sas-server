@@ -1,6 +1,8 @@
 package com.food.sas.controller;
 
+import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.FoodRegulationDTO;
+import com.food.sas.data.response.SimpleResponse;
 import com.food.sas.service.IFoodRegulationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,14 +23,22 @@ public class FoodRegulationController {
 
     @ApiOperation("获取食品细则详情")
     @GetMapping("/{id}")
-    public Mono<FoodRegulationDTO> searchFoodRegulation(@PathVariable Integer id) {
-        return Mono.just(foodRegulationService.getFoodRegulation(id));
+    public Mono<?> searchFoodRegulation(@PathVariable Integer id) {
+        FoodRegulationDTO result = foodRegulationService.getFoodRegulation(id);
+        if (result == null) {
+            return Mono.just(SimpleResponse.badRequest());
+        }
+        return Mono.just(result);
     }
 
     @ApiOperation("增加食品细则")
     @PostMapping
     public Mono<Integer> createFoodRegulation(@RequestBody FoodRegulationDTO body) {
-        body.setId(null);
+        if (body.getTypeId() == null) {
+            return Mono.error(new RuntimeException("请指定食品类别"));
+        }
         return Mono.just(foodRegulationService.createFoodRegulation(body));
     }
+
+
 }

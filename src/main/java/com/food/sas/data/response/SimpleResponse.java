@@ -27,4 +27,10 @@ public class SimpleResponse {
     public static SimpleResponse forbidden() {
         return new SimpleResponse("登录失败", 403, "账号或密码错误");
     }
+
+    public static SimpleResponse badRequest() {
+        return new SimpleResponse("参数错误", 400, "参数错误");
+    }
+
+
 }

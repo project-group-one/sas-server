@@ -11,4 +11,5 @@ public interface IFoodRegulationService {
 
     FoodRegulationDTO getFoodRegulation(Integer id);
 
+    Integer modifyFoodRegulation(FoodRegulationDTO body);
 }

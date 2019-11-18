@@ -39,4 +39,7 @@ public class FoodRegulationDTO implements Serializable {
     @ApiModelProperty("判断原则")
     private String conclusion;
 
+    @ApiModelProperty("食品类型id")
+    private Integer typeId;
+
 }

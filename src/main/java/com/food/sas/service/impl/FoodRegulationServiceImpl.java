@@ -31,11 +31,16 @@ public class FoodRegulationServiceImpl implements IFoodRegulationService {
 
     @Override
     public FoodRegulationDTO getFoodRegulation(Integer id) {
-        Optional<FoodRegulation> optional = foodRegulationRepository.findOne(QFoodRegulation.foodRegulation.id.eq(id));
+        Optional<FoodRegulation> optional = foodRegulationRepository.findOne(QFoodRegulation.foodRegulation.typeId.eq(id));
         if (optional.isPresent()) {
             return Mappers.getMapper(FoodRegulationMapper.class)
                     .fromEntity(optional.get());
         }
+        return null;
+    }
+
+    @Override
+    public Integer modifyFoodRegulation(FoodRegulationDTO body) {
         return null;
     }
 }
