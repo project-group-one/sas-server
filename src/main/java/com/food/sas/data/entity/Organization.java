@@ -1,10 +1,7 @@
 package com.food.sas.data.entity;
 
 import com.food.sas.enums.StatusEnum;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,12 +17,22 @@ import java.util.Set;
  */
 @Table(name = "t_organization")
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@NamedEntityGraphs({
+        @NamedEntityGraph(name = Organization.ALL,
+                attributeNodes = {
+                        @NamedAttributeNode(value = "users")
+                }
+        )
+})
 public class Organization implements Serializable {
+
+    public static final String ALL = "all";
 
     private static final long serialVersionUID = -2067391799785799688L;
 

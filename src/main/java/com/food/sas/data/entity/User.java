@@ -1,16 +1,13 @@
 package com.food.sas.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * @author Created by ygdxd_admin at 2018-12-21 10:16 PM
@@ -50,6 +47,7 @@ public class User implements Serializable {
     private Integer status;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Organization organization;
 
 }

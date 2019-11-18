@@ -1,8 +1,10 @@
 package com.food.sas.service.impl;
 
+import com.cosium.spring.data.jpa.entity.graph.domain.EntityGraphUtils;
 import com.food.sas.data.dto.AddUserToOrganizationRequest;
 import com.food.sas.data.dto.CreateOrganizationRequest;
 import com.food.sas.data.dto.OrganizationDTO;
+import com.food.sas.data.dto.OrganizationModel;
 import com.food.sas.data.entity.Organization;
 import com.food.sas.data.entity.QOrganization;
 import com.food.sas.data.entity.User;
@@ -19,7 +21,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -27,8 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityManager;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -48,11 +47,15 @@ public class OrganizationServiceImpl implements IOrganizationService {
 
     @Override
     public OrganizationDTO searchOrganization(Long id) {
-        return Mappers.getMapper(OrganizationMapper.class).fromEntity(organizationRepository.findById(id).get());
+        Optional<Organization> optional = organizationRepository.findById(id, EntityGraphUtils.fromName(Organization.ALL, true));
+        if (!optional.isPresent()) {
+            throw new BadException("不存该组织");
+        }
+        return Mappers.getMapper(OrganizationMapper.class).fromEntity(optional.get());
     }
 
     @Override
-    public Page<OrganizationDTO> searchOrganization(String name, Pageable pageable) {
+    public Page<OrganizationModel> searchOrganization(String name, Pageable pageable) {
         QOrganization qOrganization = QOrganization.organization;
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         BooleanBuilder builder = new BooleanBuilder();
@@ -62,7 +65,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
         JPAQuery<Organization> query = queryFactory.select(qOrganization).from(qOrganization).where(builder).orderBy(qOrganization.createDate.desc()).offset(pageable.getOffset()).limit(pageable.getPageSize());
 
         QueryResults<Organization> page = query.fetchResults();
-        return new PageImpl<>(Mappers.getMapper(OrganizationMapper.class).fromEntitys(page.getResults()), pageable, page.getTotal());
+        return new PageImpl<>(Mappers.getMapper(OrganizationMapper.class).toModels(page.getResults()), pageable, page.getTotal());
     }
 
     @Override
@@ -102,18 +105,17 @@ public class OrganizationServiceImpl implements IOrganizationService {
 
     @Override
     public void addUserToOrganization(AddUserToOrganizationRequest request) {
-        Optional<Organization> organizationOptional = organizationRepository.findById(request.getOrgId());
+        Optional<Organization> organizationOptional = organizationRepository.findById(request.getOrgId(), EntityGraphUtils.fromName(Organization.ALL, true));
         if (!organizationOptional.isPresent()) {
             throw new BadException("该组织不存在");
         }
-        Optional<User> userOptional = userRepository.findById(request.getUserId());
-        if (!userOptional.isPresent()) {
+        List<User> users = userRepository.findByIdIn(request.getUserIds());
+        if (CollectionUtils.isEmpty(users)) {
             throw new BadException("该用户不存在");
         }
         Organization organization = organizationOptional.get();
-        User user = userOptional.get();
-        organization.getUsers().add(user);
-        user.setOrganization(organization);
+        users.forEach(o -> o.setOrganization(organization));
+        organization.getUsers().addAll(users);
         organizationRepository.save(organization);
     }
 

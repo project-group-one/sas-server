@@ -10,6 +10,7 @@ spring:
     password: food@2019
     hikari:
       maximum-pool-size: 20
+      auto-commit: true
   jpa:
     show-sql: true
     generate-ddl: true
@@ -27,8 +28,8 @@ spring:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
   jackson:
     locale: zh_CN
-    #resources:
-    # static-locations: ["classpath:/static/upload/"]
+    serialization:
+      write-dates-as-timestamps: true
   # webflux:
   #   static-path-pattern: /uploads/**
   main:

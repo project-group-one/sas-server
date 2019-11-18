@@ -3,6 +3,7 @@ package com.food.sas.service;
 import com.food.sas.data.dto.AddUserToOrganizationRequest;
 import com.food.sas.data.dto.CreateOrganizationRequest;
 import com.food.sas.data.dto.OrganizationDTO;
+import com.food.sas.data.dto.OrganizationModel;
 import com.food.sas.enums.StatusEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,7 @@ public interface IOrganizationService {
 
     OrganizationDTO searchOrganization(Long id);
 
-    Page<OrganizationDTO> searchOrganization(String name, Pageable pageable);
+    Page<OrganizationModel> searchOrganization(String name, Pageable pageable);
 
     void createOrganization(CreateOrganizationRequest dto, Long creator);
 

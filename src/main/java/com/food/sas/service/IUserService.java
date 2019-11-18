@@ -4,6 +4,8 @@ import com.food.sas.data.dto.UserDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * @author Created by ygdxd_admin at 2018-12-25 7:57 PM
  */
@@ -30,4 +32,6 @@ public interface IUserService {
     UserDTO searchUserById(Long id);
 
     void thawUser(Long mId);
+
+    List<UserDTO> getUsersHasNoOrg();
 }

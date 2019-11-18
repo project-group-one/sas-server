@@ -1,6 +1,7 @@
 package com.food.sas.mapper;
 
 import com.food.sas.data.dto.OrganizationDTO;
+import com.food.sas.data.dto.OrganizationModel;
 import com.food.sas.data.entity.Organization;
 import org.mapstruct.Mapper;
 
@@ -19,4 +20,6 @@ public interface OrganizationMapper {
     List<Organization> toEntitys(List<OrganizationDTO> dtos);
 
     List<OrganizationDTO> fromEntitys(List<Organization> entitys);
+
+    List<OrganizationModel> toModels(List<Organization> data);
 }

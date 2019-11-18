@@ -22,6 +22,9 @@ public class Administrator implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Version
+    private Long version;
+
     private String username;
 
     @JsonIgnore
