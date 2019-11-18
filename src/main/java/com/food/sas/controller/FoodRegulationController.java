@@ -4,6 +4,7 @@ import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.FoodRegulationDTO;
 import com.food.sas.data.response.Result;
 import com.food.sas.data.response.SimpleResponse;
+import com.food.sas.service.FoodTypeService;
 import com.food.sas.service.IFoodRegulationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,6 +23,9 @@ public class FoodRegulationController {
     @Autowired
     private IFoodRegulationService foodRegulationService;
 
+    @Autowired
+    private FoodTypeService foodTypeService;
+
     @ApiOperation("获取食品细则详情")
     @GetMapping("/{id}")
     public Mono<Result<FoodRegulationDTO>> searchFoodRegulation(@PathVariable Integer id) {
@@ -34,6 +38,10 @@ public class FoodRegulationController {
     public Mono<?> createFoodRegulation(@RequestBody FoodRegulationDTO body) {
         if (body.getTypeId() == null) {
             return Mono.just(Result.ofFail(400, "请指定食品类别"));
+        }
+
+        if (foodTypeService.getFoodType(Long.valueOf(body.getTypeId().toString())) == null) {
+            return Mono.just(Result.ofFail(400, "食品类别不存在"));
         }
         return Mono.just(foodRegulationService.createFoodRegulation(body));
     }

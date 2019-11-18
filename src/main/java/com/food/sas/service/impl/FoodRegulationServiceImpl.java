@@ -25,6 +25,10 @@ public class FoodRegulationServiceImpl implements IFoodRegulationService {
     @Override
     public Integer createFoodRegulation(FoodRegulationDTO body) {
         FoodRegulation entity = Mappers.getMapper(FoodRegulationMapper.class).toEntity(body);
+        Optional<FoodRegulation> optional = foodRegulationRepository.findOne(QFoodRegulation.foodRegulation.typeId.eq(body.getTypeId()));
+        if (optional.isPresent()) {
+            entity.setId(optional.get().getId());
+        }
         foodRegulationRepository.saveAndFlush(entity);
         return entity.getId();
     }

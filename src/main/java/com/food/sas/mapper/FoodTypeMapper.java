@@ -19,4 +19,6 @@ public interface FoodTypeMapper {
     FoodType toEntity(FoodTypeRequest request);
 
     List<FoodTypeModel> toModels(List<FoodType> foodTypes);
+
+    FoodTypeModel fromEntity(FoodType entity);
 }
