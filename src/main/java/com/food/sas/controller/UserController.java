@@ -150,6 +150,7 @@ public class UserController {
             return Mono.error(new IllegalArgumentException("no access"));
         }
         userService.freezeUser(mId);
+        userDetailsService.freezeUser(userService.searchUserById(mId).getUsername());
         return Mono.empty();
     }
 
@@ -200,6 +201,10 @@ public class UserController {
 
         if (StringUtils.isBlank(userDTO.getUsername()) || StringUtils.isBlank(userDTO.getPassword()) || userDTO.getPhone() == null) {
             return Mono.error(new RuntimeException("参数错误！"));
+        }
+
+        if (null != userService.findUserByUsername(userDTO.getUsername())) {
+            return Mono.error(new RuntimeException("用户名已被注册！"));
         }
 
         VerificationCode verificationCode = verificationCodeService.findVerificationCodeByPhone(userDTO.getPhone());
