@@ -11,6 +11,8 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * @author Created by ygdxd_admin at 2019-11-09 5:21 PM
  */
@@ -29,7 +31,11 @@ public class FoodRegulationServiceImpl implements IFoodRegulationService {
 
     @Override
     public FoodRegulationDTO getFoodRegulation(Integer id) {
-        return Mappers.getMapper(FoodRegulationMapper.class)
-                .fromEntity(foodRegulationRepository.findOne(QFoodRegulation.foodRegulation.id.eq(id)).get());
+        Optional<FoodRegulation> optional = foodRegulationRepository.findOne(QFoodRegulation.foodRegulation.id.eq(id));
+        if (optional.isPresent()) {
+            return Mappers.getMapper(FoodRegulationMapper.class)
+                    .fromEntity(optional.get());
+        }
+        return null;
     }
 }

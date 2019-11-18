@@ -28,6 +28,7 @@ public class FoodRegulationController {
     @ApiOperation("增加食品细则")
     @PostMapping
     public Mono<Integer> createFoodRegulation(@RequestBody FoodRegulationDTO body) {
+        body.setId(null);
         return Mono.just(foodRegulationService.createFoodRegulation(body));
     }
 }
