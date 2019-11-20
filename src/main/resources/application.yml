@@ -5,7 +5,7 @@ spring:
   application:
     name: food-sas-service
   datasource:
-    url: jdbc:mysql://182.92.164.72:4000/sas?useUnicode=true&connectTimeout=2000&socketTimeout=6000&rewriteBatchedStatements=TRUE&serverTimezone=Hongkong
+    url: jdbc:mysql://127.0.0.1:4000/sas?useUnicode=true&connectTimeout=2000&socketTimeout=6000&rewriteBatchedStatements=TRUE&serverTimezone=Hongkong
     username: food
     password: food@2019
     hikari:
