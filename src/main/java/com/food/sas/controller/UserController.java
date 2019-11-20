@@ -146,8 +146,18 @@ public class UserController {
             throw new BadException("no access");
         }
         userService.freezeUser(mId);
+        userDetailsService.freezeUser(userService.searchUserById(mId).getUsername());
         return Mono.empty();
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @ApiOperation("解冻用户")
+    @PostMapping("/{mId}/thaw")
+    public Mono<?> thawUser(@ApiParam("需要解冻的用户id") @PathVariable Long mId) {
+        userService.thawUser(mId);
+        return Mono.empty();
+    }
+
 
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -187,6 +197,10 @@ public class UserController {
 
         if (StringUtils.isBlank(userDTO.getUsername()) || StringUtils.isBlank(userDTO.getPassword()) || userDTO.getPhone() == null) {
             throw new BadException("参数错误");
+        }
+
+        if (null != userService.findUserByUsername(userDTO.getUsername())) {
+            return Mono.error(new RuntimeException("用户名已被注册！"));
         }
 
         VerificationCode verificationCode = verificationCodeService.findVerificationCodeByPhone(userDTO.getPhone());

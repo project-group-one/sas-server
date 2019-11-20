@@ -53,5 +53,8 @@ public class FoodRegulation {
     private String conclusion;
 
 
+    private Integer typeId;
+
+
 //    private
 }

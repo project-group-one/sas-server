@@ -3,11 +3,13 @@ package com.food.sas.service;
 import com.food.sas.data.dto.FoodTypeModel;
 import com.food.sas.data.dto.FoodTypeRequest;
 import com.food.sas.data.entity.FoodType;
+import com.food.sas.data.entity.QFoodType;
 import com.food.sas.data.repository.FoodTypeRepository;
 import com.food.sas.mapper.FoodTypeMapper;
 import com.food.sas.util.TreeHelper;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -46,6 +48,14 @@ public class FoodTypeService {
         List<FoodTypeModel> foodTypeModels = FoodTypeMapper.MAPPER.toModels(foodTypes);
         List<FoodTypeModel> typeModels = TreeHelper.buildTree(-1L, foodTypeModels);
         return Flux.fromIterable(typeModels);
+    }
+
+    public Mono<FoodTypeModel> getFoodType(Long id) {
+        Optional<FoodType> optional = foodTypeRepository.findOne(QFoodType.foodType.id.eq(id));
+        if (optional.isPresent()) {
+            return Mono.just(FoodTypeMapper.MAPPER.fromEntity(optional.get()));
+        }
+        return Mono.empty();
     }
 
     public Mono<Long> modifyFoodType(FoodTypeRequest body) {

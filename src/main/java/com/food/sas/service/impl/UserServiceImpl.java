@@ -55,7 +55,11 @@ public class UserServiceImpl implements IUserService {
     @Override
     public UserDTO findUserByUsername(String username) {
         QUser qUser = QUser.user;
-        return Mappers.getMapper(UserMapper.class).fromEntity(userRepository.findOne(qUser.username.eq(username)).get());
+        Optional<User> optional = userRepository.findOne(qUser.username.eq(username));
+        if (optional.isPresent()) {
+            return Mappers.getMapper(UserMapper.class).fromEntity(optional.get());
+        }
+        return null;
 
     }
 
@@ -143,6 +147,14 @@ public class UserServiceImpl implements IUserService {
     @Override
     public UserDTO searchUserById(Long id) {
         return Mappers.getMapper(UserMapper.class).fromEntity(userRepository.findById(id).get());
+    }
+
+    @Override
+    public void thawUser(Long mId) {
+        userRepository.findById(mId).ifPresent(user -> {
+            user.setStatus(0);
+            userRepository.saveAndFlush(user);
+        });
     }
 
     @Override
