@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 /**
  * Created by zj on 2019/1/6
  */
@@ -34,8 +36,8 @@ public class FoodTypeController {
 
     @ApiOperation("食品类别树")
     @GetMapping
-    public Result<Flux<FoodTypeModel>> queryFoodType() {
-        return Result.success(foodTypeService.queryFoodType());
+    public Mono<Result<List<FoodTypeModel>>> queryFoodType() {
+        return foodTypeService.queryFoodType().collectList().map(r -> Result.success(r));
     }
 
     @ApiOperation("修改食品树")
