@@ -1,6 +1,7 @@
 package com.food.sas.exception;
 
-import com.food.sas.data.response.Result;
+import com.food.sas.data.response.R;
+import com.food.sas.data.response.SystemCode;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -37,52 +38,52 @@ public class RestExceptionTranslator {
 
     @ExceptionHandler(ServerWebInputException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Mono<Result> handleError(ServerWebInputException e) {
+    public Mono<R> handleError(ServerWebInputException e) {
         log.warn("缺少请求参数:{}", e.getMessage());
         MethodParameter parameter = e.getMethodParameter();
         String message = String.format("缺少必要的请求参数: %s", parameter.getParameterName());
-        return Mono.just(Result.ofFail(400, message));
+        return Mono.just(R.fail(SystemCode.PARAM_MISS, message));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Mono<Result> handleError(MethodArgumentNotValidException e) {
+    public Mono<R> handleError(MethodArgumentNotValidException e) {
         log.warn("参数验证失败:{}", e.getMessage());
         return Mono.just(handleError(e.getBindingResult()));
     }
 
     @ExceptionHandler(WebExchangeBindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Mono<Result> handleError(WebExchangeBindException e) {
+    public Mono<R> handleError(WebExchangeBindException e) {
         log.warn("参数绑定失败:{}", e.getMessage());
         return Mono.just(handleError(e.getBindingResult()));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Mono<Result> handleError(ConstraintViolationException e) {
+    public Mono<R> handleError(ConstraintViolationException e) {
         log.warn("参数验证失败:{}", e.getMessage());
         return Mono.just(handleError(e.getConstraintViolations()));
     }
 
     @ExceptionHandler(ResponseStatusException.class)
-    public Mono<ResponseEntity<Result>> handleError(ResponseStatusException e) {
+    public Mono<ResponseEntity<R>> handleError(ResponseStatusException e) {
         log.error("响应状态异常:{}", e.getMessage());
-        ResponseEntity<Result> entity = ResponseEntity.status(e.getStatus())
-                .body(Result.ofFail(500, e.getMessage()));
+        ResponseEntity<R> entity = ResponseEntity.status(e.getStatus())
+                .body(R.fail(SystemCode.REQ_REJECT, e.getMessage()));
         return Mono.just(entity);
     }
 
-    Result handleError(BindingResult result) {
+    R handleError(BindingResult result) {
         FieldError error = result.getFieldError();
         String message = String.format("%s:%s", error.getField(), error.getDefaultMessage());
-        return Result.ofFail(500, message);
+        return R.fail(SystemCode.PARAM_BIND_ERROR, message);
     }
 
-    Result handleError(Set<ConstraintViolation<?>> violations) {
+    R handleError(Set<ConstraintViolation<?>> violations) {
         ConstraintViolation<?> violation = violations.iterator().next();
         String path = ((PathImpl) violation.getPropertyPath()).getLeafNode().getName();
         String message = String.format("%s:%s", path, violation.getMessage());
-        return Result.ofFail(400, message);
+        return R.fail(SystemCode.PARAM_VALID_ERROR, message);
     }
 }

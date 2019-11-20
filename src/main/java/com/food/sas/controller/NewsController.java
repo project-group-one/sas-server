@@ -1,8 +1,8 @@
 package com.food.sas.controller;
 
-import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.CommentRequest;
 import com.food.sas.data.dto.NewsDTO;
+import com.food.sas.data.response.R;
 import com.food.sas.service.INewsService;
 import com.food.sas.service.IUserService;
 import io.swagger.annotations.Api;
@@ -37,7 +37,7 @@ public class NewsController {
 
     @ApiOperation("获得单个新闻内容")
     @GetMapping("/{id}")
-    public BaseResult<NewsDTO> getNewsById(@PathVariable Long id) throws IOException {
+    public R<NewsDTO> getNewsById(@PathVariable Long id) throws IOException {
         NewsDTO dto = newsService.getNewsById(id);
         if (dto.getStoreUrl() != null) {
             Path path = Paths.get(dto.getStoreUrl());
@@ -46,15 +46,15 @@ public class NewsController {
                 dto.setContent(new String(data));
             }
         }
-        return new BaseResult<>(dto);
+        return R.success(dto);
     }
 
     @ApiOperation("获取新闻资讯列表")
     @GetMapping
-    public BaseResult<List<NewsDTO>> getNewsList(NewsDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
-                                                 @RequestParam(value = "size", defaultValue = "20") int size) {
-        Page<NewsDTO> result = newsService.getNewsList(dto, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));
-        return new BaseResult<>(result.getContent(), result);
+    public R<List<NewsDTO>> getNewsList(NewsDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
+                                        @RequestParam(value = "size", defaultValue = "20") int size) {
+        Page<NewsDTO> result = newsService.getNewsList(dto, PageRequest.of(Math.max(page - 1, 0), size));
+        return R.success(result.getContent(), result);
     }
 
 
@@ -66,7 +66,6 @@ public class NewsController {
         Files.write(data, body.getContent().getBytes());
         body.setStoreUrl(data.toAbsolutePath().toString());
         newsService.saveNews(body);
-
         return Mono.empty();
     }
 

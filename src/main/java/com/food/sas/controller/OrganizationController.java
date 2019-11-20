@@ -1,6 +1,10 @@
 package com.food.sas.controller;
 
-import com.food.sas.data.dto.*;
+import com.food.sas.data.dto.AddUserToOrganizationRequest;
+import com.food.sas.data.dto.CreateOrganizationRequest;
+import com.food.sas.data.dto.OrganizationDTO;
+import com.food.sas.data.dto.OrganizationModel;
+import com.food.sas.data.response.R;
 import com.food.sas.enums.StatusEnum;
 import com.food.sas.service.IOrganizationService;
 import com.food.sas.service.IUserService;
@@ -34,17 +38,17 @@ public class OrganizationController {
 
     @ApiOperation("根据id查询组织")
     @GetMapping("/{id}")
-    public Mono<OrganizationDTO> searchOrganization(@PathVariable Long id) {
-        return Mono.just(service.searchOrganization(id));
+    public R<OrganizationDTO> searchOrganization(@PathVariable Long id) {
+        return R.success(service.searchOrganization(id));
     }
 
     @ApiOperation("查询组织")
     @GetMapping
-    public BaseResult<List<OrganizationModel>> searchOrganization(@RequestParam(required = false) String name, @RequestParam(value = "current", defaultValue = "1") int page,
-                                                                @RequestParam(value = "size", defaultValue = "20") int size) {
+    public R<List<OrganizationModel>> searchOrganization(@RequestParam(required = false) String name, @RequestParam(value = "current", defaultValue = "1") int page,
+                                                         @RequestParam(value = "size", defaultValue = "20") int size) {
 
         Page<OrganizationModel> result = service.searchOrganization(name, PageRequest.of(Math.max(page - 1, 0), size));
-        return new BaseResult<>(result.getContent(), result);
+        return R.success(result.getContent(), result);
     }
 
     @ApiOperation("新增组织")

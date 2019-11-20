@@ -1,6 +1,7 @@
 package com.food.sas.exception;
 
-import com.food.sas.data.response.Result;
+import com.food.sas.data.response.R;
+import com.food.sas.data.response.SystemCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
@@ -19,6 +20,8 @@ import org.springframework.web.reactive.function.server.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 /**
  * @author zj
@@ -48,16 +51,16 @@ public class ErrorWebExceptionHandler extends DefaultErrorWebExceptionHandler {
         log.error(String.format("URL:%s error status:%d", requestUrl, status.value()), error);
         // 返回消息
         String message = status.value() + ":" + status.getReasonPhrase();
-        Result result;
+        R r;
         if (error instanceof BadException) {
-            String msg = ((BadException) error).getMsg();
-            result = Result.ofFail(500, msg);
+            r = ((BadException) error).getResult();
+            r = Optional.ofNullable(r).orElse(R.fail(SystemCode.FAILURE));
         } else {
-            result = Result.ofFail(500, message);
+            r = R.fail(SystemCode.FAILURE, message);
         }
         return ServerResponse.status(status)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromObject(result));
+                .body(BodyInserters.fromObject(r));
     }
 
     private HttpStatus determineHttpStatus(Throwable error) {

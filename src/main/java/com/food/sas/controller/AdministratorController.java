@@ -4,11 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.food.sas.data.dto.AdministratorDTO;
 import com.food.sas.data.dto.AdministratorRequest;
 import com.food.sas.data.dto.UserDTO;
-import com.food.sas.data.response.SimpleResponse;
+import com.food.sas.data.response.R;
 import com.food.sas.service.IAdministratorService;
 import com.food.sas.service.IUserService;
 import com.google.common.cache.LoadingCache;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
@@ -45,8 +44,7 @@ public class AdministratorController {
     private PasswordEncoder encoder;
 
     @PostMapping("/login")
-    public Mono<?> login(@Valid @RequestBody AdministratorRequest body, ServerWebExchange exchange) {
-//        cache.put();
+    public Mono<Void> login(@Valid @RequestBody AdministratorRequest body, ServerWebExchange exchange) {
         AdministratorDTO administrator = administratorService.getAdministrator(body.getUsername(), encoder.encode(body.getPassword()));
         if (administrator == null) {
             return Mono.defer(() -> Mono.just(exchange.getResponse()))
@@ -54,19 +52,19 @@ public class AdministratorController {
                         response.setStatusCode(HttpStatus.FORBIDDEN);
                         response.getHeaders().setContentType(MediaType.TEXT_PLAIN);
                         DataBufferFactory dataBufferFactory = response.bufferFactory();
-                        DataBuffer buffer = dataBufferFactory.wrap(JSON.toJSONString(SimpleResponse.forbidden()).getBytes(
+                        DataBuffer buffer = dataBufferFactory.wrap(JSON.toJSONString(R.forbidden()).getBytes(
                                 Charset.defaultCharset()));
                         return response.writeWith(Mono.just(buffer))
                                 .doOnError(error -> DataBufferUtils.release(buffer));
                     });
         }
 
-        return Mono.just(",");
+        return Mono.empty();
     }
 
     @PostMapping("/register")
-    public Mono<?> register(@Valid @RequestBody AdministratorRequest body) {
-        return Mono.just("a");
+    public Mono<Void> register(@Valid @RequestBody AdministratorRequest body) {
+        return Mono.empty();
     }
 
     @GetMapping("/searchCustom")

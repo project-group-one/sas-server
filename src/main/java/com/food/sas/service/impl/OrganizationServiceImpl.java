@@ -49,7 +49,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
     public OrganizationDTO searchOrganization(Long id) {
         Optional<Organization> optional = organizationRepository.findById(id, EntityGraphUtils.fromName(Organization.ALL, true));
         if (!optional.isPresent()) {
-            throw new BadException("不存该组织");
+            throw new BadException("不存该");
         }
         return Mappers.getMapper(OrganizationMapper.class).fromEntity(optional.get());
     }

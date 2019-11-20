@@ -1,8 +1,8 @@
 package com.food.sas.controller;
 
-import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.entity.FileInfo;
 import com.food.sas.data.repository.FileInfoRepository;
+import com.food.sas.data.response.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -43,7 +43,7 @@ public class FileController {
 
     @ApiOperation("上传文件")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public BaseResult uploadFile(@RequestPart("file") FilePart filePart) throws IOException {
+    public R<String> uploadFile(@RequestPart("file") FilePart filePart) throws IOException {
         String extension = FilenameUtils.getExtension(filePart.filename());
         File classPath = new File(ResourceUtils.getURL("classpath:static").getPath());
 
@@ -59,7 +59,7 @@ public class FileController {
         String url = file.getFileName().toString();
         String prefix = file.toString().replace(url, "");
         fileRepository.save(FileInfo.builder().name(filePart.filename()).path(url).prefix(prefix).build());
-        return new BaseResult<>(url);
+        return R.success(url);
     }
 
     @ApiOperation("下载文件")

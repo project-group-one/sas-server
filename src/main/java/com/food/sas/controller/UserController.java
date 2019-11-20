@@ -1,10 +1,10 @@
 package com.food.sas.controller;
 
 import com.food.sas.config.SmsSender;
-import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.UserDTO;
 import com.food.sas.data.entity.VerificationCode;
-import com.food.sas.data.repository.IVerificationCodeRepository;
+import com.food.sas.data.response.R;
+import com.food.sas.exception.BadException;
 import com.food.sas.security.service.MyMapReactiveUserDetailsService;
 import com.food.sas.service.IUserService;
 import com.food.sas.service.IVerificationCodeService;
@@ -16,21 +16,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -77,41 +73,41 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("根据id查询")
     @GetMapping("/{id}")
-    public Mono<?> searchUser(@PathVariable Long id, @ApiIgnore Authentication authentication, @ApiIgnore ServerWebExchange exchange) {
+    public R<UserDTO> searchUser(@PathVariable Long id, @ApiIgnore Authentication authentication, @ApiIgnore ServerWebExchange exchange) {
         if (authentication == null && !authentication.isAuthenticated()) {
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-            return Mono.just("用户未登录");
+            return R.fail("用户未登录");
         }
-        return Mono.just(userService.searchUserById(id));
+        return R.success(userService.searchUserById(id));
     }
 
     @ApiOperation("登录后调用 获取必要参数")
     @GetMapping("/current")
-    public Mono<?> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
+    public R<UserDTO> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
         if (authentication != null && authentication.isAuthenticated()) {
-            return Mono.just(userService.findUserByUsername(authentication.getName()));
+            return R.success(userService.findUserByUsername(authentication.getName()));
         }
         exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-        return Mono.just("用户未登录");
+        return R.fail("用户未登录");
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("用户列表查询 查询参数 username(半模糊) address type name(半模糊)")
     @GetMapping
-    public Mono<BaseResult<List<UserDTO>>> getUserPages(UserDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
-                                                        @RequestParam(value = "size", defaultValue = "20") int size) {
-        Page<UserDTO> result = userService.getUserPage(dto, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));
-        return Mono.just(new BaseResult<>(result.getContent(), result));
+    public Mono<R<List<UserDTO>>> getUserPages(UserDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
+                                               @RequestParam(value = "size", defaultValue = "20") int size) {
+        Page<UserDTO> result = userService.getUserPage(dto, PageRequest.of(Math.max(page - 1, 0), size));
+        return Mono.just(R.success(result.getContent(), result));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("添加用户")
     @PostMapping
-    public Mono<?> registeredUser(@ApiParam(value = "创建用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id, @RequestBody UserDTO dto) {
+    public Mono<Void> registeredUser(@ApiParam(value = "创建用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id, @RequestBody UserDTO dto) {
 
         dto.setRole(ROLE);
         if (!userService.validate(id, dto.getType())) {
-            return Mono.error(new IllegalArgumentException("type is illegal"));
+            throw new BadException("type is illegal");
         }
         dto.setPassword(SALT + encoder.encode(dto.getPassword()));
         UserDTO user = userService.createUser(dto);
@@ -128,14 +124,14 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("修改用户")
     @PutMapping("/{mId}")
-    public Mono<?> modifyManager(@RequestBody UserDTO dto,
-                                 @ApiParam("需要修改的用户的id") @PathVariable Long mId,
-                                 @ApiParam(value = "修改用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id) {
+    public Mono<Void> modifyManager(@RequestBody UserDTO dto,
+                                    @ApiParam("需要修改的用户的id") @PathVariable Long mId,
+                                    @ApiParam(value = "修改用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id) {
         if (!userService.validateById(id, mId)) {
-            return Mono.error(new IllegalArgumentException("no access"));
+            throw new BadException("no access");
         }
         if (dto.getType() != null && !userService.validate(id, dto.getType())) {
-            return Mono.error(new IllegalArgumentException("type is illegal"));
+            throw new BadException("type is illegal");
         }
         userService.modifyManager(dto, mId);
         return Mono.empty();
@@ -144,10 +140,10 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("冻结用户")
     @PostMapping("/{mId}/freeze")
-    public Mono<?> freezeUser(@ApiParam(value = "冻结用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id,
-                              @ApiParam("需要冻结的用户id") @PathVariable Long mId) {
+    public Mono<Void> freezeUser(@ApiParam(value = "冻结用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id,
+                                 @ApiParam("需要冻结的用户id") @PathVariable Long mId) {
         if (!userService.validateById(id, mId)) {
-            return Mono.error(new IllegalArgumentException("no access"));
+            throw new BadException("no access");
         }
         userService.freezeUser(mId);
         return Mono.empty();
@@ -157,11 +153,11 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("删除管理员")
     @DeleteMapping
-    public Mono<?> deleteUser(@ApiParam("id以逗号分隔") @RequestParam Long[] ids,
-                              @ApiParam(value = "删除用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id) {
+    public Mono<Void> deleteUser(@ApiParam("id以逗号分隔") @RequestParam Long[] ids,
+                                 @ApiParam(value = "删除用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") @RequestParam Long id) {
         for (Long mId : ids) {
             if (!userService.validateById(id, mId)) {
-                return Mono.error(new IllegalArgumentException("no access"));
+                throw new BadException("no access");
             }
         }
         userService.batchDeleteUser(ids);
@@ -171,11 +167,11 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("修改用户权限")
     @PutMapping("/{mId}/freeze")
-    public Mono<?> changeRole(@PathVariable Long mId,
-                              @ApiParam(value = "修改用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") Long id,
-                              @ApiParam("1 GUEST 2 NORMAL 4 ADMIN") Integer role) {
+    public Mono<Void> changeRole(@PathVariable Long mId,
+                                 @ApiParam(value = "修改用户的用户id  如果该id的用户权限小于等于创建的用户 则失败") Long id,
+                                 @ApiParam("1 GUEST 2 NORMAL 4 ADMIN") Integer role) {
         if (!userService.validateById(id, mId)) {
-            return Mono.error(new IllegalArgumentException("no access"));
+            throw new BadException("no access");
         }
         String r = getRole(role);
         String s = userService.changeRole(mId, r);
@@ -187,15 +183,15 @@ public class UserController {
 
     @ApiOperation("手机注册")
     @PostMapping("/phone")
-    public Mono<?> phoneRegister(@RequestParam String code, @RequestBody UserDTO userDTO) {
+    public Mono<Void> phoneRegister(@RequestParam String code, @RequestBody UserDTO userDTO) {
 
         if (StringUtils.isBlank(userDTO.getUsername()) || StringUtils.isBlank(userDTO.getPassword()) || userDTO.getPhone() == null) {
-            return Mono.error(new RuntimeException("参数错误！"));
+            throw new BadException("参数错误");
         }
 
         VerificationCode verificationCode = verificationCodeService.findVerificationCodeByPhone(userDTO.getPhone());
         if (verificationCode == null || !verificationCode.getPhone().equals(userDTO.getPhone()) || verificationCode.getRegistered() > 0 || verificationCode.getExpired().isBefore(LocalDateTime.now()) || !verificationCode.getCode().equals(code)) {
-            return Mono.error(new RuntimeException("注册失败！"));
+            throw new BadException("注册失败");
         }
         userDTO.setStatus(0);
         userDTO.setRole("CLIENT");
@@ -214,11 +210,10 @@ public class UserController {
 
     @ApiOperation("发送验证码")
     @GetMapping("/code")
-    public Mono<?> sendSMS(@RequestParam String phone) {
+    public Mono<Void> sendSMS(@RequestParam String phone) {
         if (phone.length() != 11 || !phone.matches(PHONE_REGEX)) {
-            return Mono.error(new IllegalArgumentException("手机号格式错误"));
+            throw new BadException("手机号格式错误");
         }
-
         int i = 1000000 + ThreadLocalRandom.current().nextInt(999999);
         String code = String.valueOf(i).substring(1);
         if (sender.send(phone, code)) {
@@ -233,16 +228,14 @@ public class UserController {
             verificationCode.setRegistered(0);
             verificationCodeService.saveOrUpdateVerificationCode(verificationCode);
         } else {
-            return Mono.error(new RuntimeException("短信发送失败！"));
+            throw new BadException("短信发送失败");
         }
-
-
         return Mono.empty();
     }
 
     @ApiOperation("修改密码")
     @PutMapping("/pwd")
-    public Mono<?> modifyPassword(Authentication authentication, @RequestParam String oPwd, @RequestParam String nPwd) {
+    public R<Mono<UserDetails>> modifyPassword(Authentication authentication, @RequestParam String oPwd, @RequestParam String nPwd) {
         if (authentication.isAuthenticated()) {
             //判断旧密码是否相同
             UserDTO user = userService.findUserByUsername(authentication.getName());
@@ -250,18 +243,17 @@ public class UserController {
             if (b) {
                 user.setPassword(SALT + encoder.encode(nPwd));
                 userService.createUser(user);
-                return userDetailsService.updatePassword(new com.food.sas.security.User(user.getId(), user.getType(), user.getUsername(), user.getPassword().substring(5), AuthorityUtils.createAuthorityList(user.getRole().split(","))), user.getPassword().substring(5));
+                R.success(userDetailsService.updatePassword(new com.food.sas.security.User(user.getId(), user.getType(), user.getUsername(), user.getPassword().substring(5), AuthorityUtils.createAuthorityList(user.getRole().split(","))), user.getPassword().substring(5)));
             }
         }
-
-        return Mono.error(new RuntimeException("修改密码失败"));
+        return R.fail("修改密码失败");
     }
 
     @ApiOperation("获取没有组织的用户")
     @GetMapping("/not-org")
-    public Mono<BaseResult<List<UserDTO>>> getUsersHasNotOrg() {
+    public Mono<R<List<UserDTO>>> getUsersHasNotOrg() {
         List<UserDTO> users = userService.getUsersHasNoOrg();
-        return Mono.just(new BaseResult<>(users));
+        return Mono.just(R.success(users));
     }
 
 
@@ -276,7 +268,7 @@ public class UserController {
                 builder.append(",").append(ROLE_GUEST);
             }
         }
-        return builder.substring(1).toString();
+        return builder.substring(1);
     }
 
 }

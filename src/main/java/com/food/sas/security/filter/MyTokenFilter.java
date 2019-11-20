@@ -1,12 +1,9 @@
 package com.food.sas.security.filter;
 
 import com.alibaba.fastjson.JSON;
-import com.food.sas.data.dto.UserDTO;
-import com.food.sas.security.SecurityConfiguration;
-import com.food.sas.security.jwt.JwtBody;
+import com.food.sas.exception.BadException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -58,7 +55,7 @@ public class MyTokenFilter implements WebFilter {
                 UserDetails userDetails = JSON.parseObject(json, User.class);
 
                 final Mono<Authentication> authentication = userDetailsService.findByUsername(userDetails.getUsername()).filter(u -> u.getPassword().equals(userDetails.getPassword()))
-                        .switchIfEmpty(Mono.defer(() -> Mono.error(new BadCredentialsException("Invalid Credentials"))))
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new BadException("Invalid Credentials"))))
                         .map(u -> new UsernamePasswordAuthenticationToken(u, u.getPassword(), u.getAuthorities()));
 //
 //                SecurityContextImpl securityContext = new SecurityContextImpl();

@@ -1,12 +1,11 @@
 package com.food.sas.controller;
 
-import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.FocalPictureDTO;
+import com.food.sas.data.response.R;
 import com.food.sas.service.IFocalPictureService;
 import com.food.sas.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,18 +32,17 @@ public class FocalPictureController {
 
     @ApiOperation("获取单个焦点图")
     @GetMapping("/{id}")
-    public Mono<FocalPictureDTO> searchFocalPicture(@PathVariable Long id) {
-        return Mono.just(service.searchFocalPicture(id));
+    public R<FocalPictureDTO> searchFocalPicture(@PathVariable Long id) {
+        return R.success(service.searchFocalPicture(id));
     }
 
 
     @ApiOperation("查询焦点图")
     @GetMapping
-    public BaseResult<List<FocalPictureDTO>> searchFocalPicture(@RequestParam(required = false) String name, @RequestParam(value = "current", defaultValue = "1") int page,
-                                                                @RequestParam(value = "size", defaultValue = "20") int size) {
-        Page<FocalPictureDTO> result = service.searchFocalPicture(name, PageRequest.of(page - 1 < 0 ? 0 : page - 1, size));
-
-        return new BaseResult<>(result.getContent(), result);
+    public R<List<FocalPictureDTO>> searchFocalPicture(@RequestParam(required = false) String name, @RequestParam(value = "current", defaultValue = "1") int page,
+                                                       @RequestParam(value = "size", defaultValue = "20") int size) {
+        Page<FocalPictureDTO> result = service.searchFocalPicture(name, PageRequest.of(Math.max(page - 1, 0), size));
+        return R.success(result.getContent(), result);
     }
 
     @ApiOperation("新增焦点图")
@@ -65,8 +63,8 @@ public class FocalPictureController {
 
     @ApiOperation("删除焦点图")
     @DeleteMapping
-    public Mono<Boolean> deleteFocalPicture(@RequestParam Long[] ids) {
+    public R<Boolean> deleteFocalPicture(@RequestParam Long[] ids) {
         service.batchDeleteFocalPicture(ids);
-        return Mono.just(true);
+        return R.success(true);
     }
 }
