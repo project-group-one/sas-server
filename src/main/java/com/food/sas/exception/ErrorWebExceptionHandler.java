@@ -1,6 +1,6 @@
 package com.food.sas.exception;
 
-import com.food.sas.data.response.R;
+import com.food.sas.data.response.Result;
 import com.food.sas.data.response.SystemCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.ErrorProperties;
@@ -51,16 +51,16 @@ public class ErrorWebExceptionHandler extends DefaultErrorWebExceptionHandler {
         log.error(String.format("URL:%s error status:%d", requestUrl, status.value()), error);
         // 返回消息
         String message = status.value() + ":" + status.getReasonPhrase();
-        R r;
+        Result result;
         if (error instanceof BadException) {
-            r = ((BadException) error).getResult();
-            r = Optional.ofNullable(r).orElse(R.fail(SystemCode.FAILURE));
+            result = ((BadException) error).getResult();
+            result = Optional.ofNullable(result).orElse(Result.fail(SystemCode.FAILURE));
         } else {
-            r = R.fail(SystemCode.FAILURE, message);
+            result = Result.fail(SystemCode.FAILURE, message);
         }
         return ServerResponse.status(status)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromObject(r));
+                .body(BodyInserters.fromObject(result));
     }
 
     private HttpStatus determineHttpStatus(Throwable error) {

@@ -1,7 +1,7 @@
 package com.food.sas.controller;
 
 import com.food.sas.data.dto.FocalPictureDTO;
-import com.food.sas.data.response.R;
+import com.food.sas.data.response.Result;
 import com.food.sas.service.IFocalPictureService;
 import com.food.sas.service.IUserService;
 import io.swagger.annotations.Api;
@@ -32,17 +32,17 @@ public class FocalPictureController {
 
     @ApiOperation("获取单个焦点图")
     @GetMapping("/{id}")
-    public R<FocalPictureDTO> searchFocalPicture(@PathVariable Long id) {
-        return R.success(service.searchFocalPicture(id));
+    public Result<FocalPictureDTO> searchFocalPicture(@PathVariable Long id) {
+        return Result.success(service.searchFocalPicture(id));
     }
 
 
     @ApiOperation("查询焦点图")
     @GetMapping
-    public R<List<FocalPictureDTO>> searchFocalPicture(@RequestParam(required = false) String name, @RequestParam(value = "current", defaultValue = "1") int page,
-                                                       @RequestParam(value = "size", defaultValue = "20") int size) {
+    public Result<List<FocalPictureDTO>> searchFocalPicture(@RequestParam(required = false) String name, @RequestParam(value = "current", defaultValue = "1") int page,
+                                                            @RequestParam(value = "size", defaultValue = "20") int size) {
         Page<FocalPictureDTO> result = service.searchFocalPicture(name, PageRequest.of(Math.max(page - 1, 0), size));
-        return R.success(result.getContent(), result);
+        return Result.success(result.getContent(), result);
     }
 
     @ApiOperation("新增焦点图")
@@ -63,8 +63,8 @@ public class FocalPictureController {
 
     @ApiOperation("删除焦点图")
     @DeleteMapping
-    public R<Boolean> deleteFocalPicture(@RequestParam Long[] ids) {
+    public Result<Boolean> deleteFocalPicture(@RequestParam Long[] ids) {
         service.batchDeleteFocalPicture(ids);
-        return R.success(true);
+        return Result.success(true);
     }
 }

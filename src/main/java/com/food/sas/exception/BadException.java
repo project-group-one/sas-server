@@ -1,7 +1,7 @@
 package com.food.sas.exception;
 
 import com.food.sas.data.response.IResultCode;
-import com.food.sas.data.response.R;
+import com.food.sas.data.response.Result;
 
 import javax.annotation.Nullable;
 
@@ -12,9 +12,9 @@ public class BadException extends RuntimeException {
     private static final long serialVersionUID = 2359767895161832954L;
 
     @Nullable
-    private final R<?> result;
+    private final Result<?> result;
 
-    public BadException(R<?> result) {
+    public BadException(Result<?> result) {
         super(result.getMsg());
         this.result = result;
     }
@@ -25,7 +25,7 @@ public class BadException extends RuntimeException {
 
     public BadException(IResultCode rCode, String message) {
         super(message);
-        this.result = R.fail(rCode, message);
+        this.result = Result.fail(rCode, message);
     }
 
     public BadException(String message) {
@@ -45,8 +45,8 @@ public class BadException extends RuntimeException {
 
     @Nullable
     @SuppressWarnings("unchecked")
-    public <T> R<T> getResult() {
-        return (R<T>) result;
+    public <T> Result<T> getResult() {
+        return (Result<T>) result;
     }
 
     /**

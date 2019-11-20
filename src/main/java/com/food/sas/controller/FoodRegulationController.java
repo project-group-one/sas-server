@@ -1,9 +1,8 @@
 package com.food.sas.controller;
 
-import com.food.sas.data.dto.BaseResult;
 import com.food.sas.data.dto.FoodRegulationDTO;
 import com.food.sas.data.response.Result;
-import com.food.sas.data.response.SimpleResponse;
+import com.food.sas.data.response.SystemCode;
 import com.food.sas.service.FoodTypeService;
 import com.food.sas.service.IFoodRegulationService;
 import io.swagger.annotations.Api;
@@ -30,18 +29,18 @@ public class FoodRegulationController {
     @GetMapping("/{id}")
     public Mono<Result<FoodRegulationDTO>> searchFoodRegulation(@PathVariable Integer id) {
         FoodRegulationDTO result = foodRegulationService.getFoodRegulation(id);
-        return Mono.just(Result.ofSuccess(result));
+        return Mono.just(Result.success(result));
     }
 
     @ApiOperation("增加食品细则")
     @PostMapping
     public Mono<?> createFoodRegulation(@RequestBody FoodRegulationDTO body) {
         if (body.getTypeId() == null) {
-            return Mono.just(Result.ofFail(400, "请指定食品类别"));
+            return Mono.just(Result.fail(SystemCode.BAD_REQUEST, "请指定食品类别"));
         }
 
         if (foodTypeService.getFoodType(Long.valueOf(body.getTypeId().toString())) == null) {
-            return Mono.just(Result.ofFail(400, "食品类别不存在"));
+            return Mono.just(Result.fail(SystemCode.NOT_FOUND, "食品类别不存在"));
         }
         return Mono.just(foodRegulationService.createFoodRegulation(body));
     }

@@ -3,7 +3,7 @@ package com.food.sas.controller;
 import com.food.sas.data.dto.DetectionResultModel;
 import com.food.sas.data.dto.ExaminingReportRequest;
 import com.food.sas.data.entity.ExaminingReport;
-import com.food.sas.data.response.R;
+import com.food.sas.data.response.Result;
 import com.food.sas.service.ExaminingReportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,18 +28,18 @@ public class ExaminingReportController {
 
     @ApiOperation("检测报告列表")
     @GetMapping
-    public R<List<ExaminingReport>> listExaminingReports(@RequestParam(value = "name", required = false) String name,
-                                                         @RequestParam(value = "current", defaultValue = "1") int page,
-                                                         @RequestParam(value = "pageSize", defaultValue = "20") int size) {
+    public Result<List<ExaminingReport>> listExaminingReports(@RequestParam(value = "name", required = false) String name,
+                                                              @RequestParam(value = "current", defaultValue = "1") int page,
+                                                              @RequestParam(value = "pageSize", defaultValue = "20") int size) {
         Page<ExaminingReport> reportPage = examiningReportService.listExaminingReports(name, page, size);
-        return R.success(reportPage.getContent(), reportPage);
+        return Result.success(reportPage.getContent(), reportPage);
     }
 
     @ApiOperation("检测报告详情")
     @GetMapping("/{id}")
-    public R<ExaminingReport> getExaminingReport(@PathVariable("id") Long id) {
+    public Result<ExaminingReport> getExaminingReport(@PathVariable("id") Long id) {
         Optional<ExaminingReport> examiningReport = examiningReportService.getExaminingReport(id);
-        return R.success(examiningReport.orElse(null));
+        return Result.success(examiningReport.orElse(null));
     }
 
     @ApiOperation("创建检测报告")
@@ -56,14 +56,14 @@ public class ExaminingReportController {
 
     @ApiOperation("检测分析")
     @PatchMapping("/{id}/detection")
-    public R<DetectionResultModel> detectionReport(@PathVariable("id") Long id) {
+    public Result<DetectionResultModel> detectionReport(@PathVariable("id") Long id) {
         try {
             examiningReportService.detectionReport(id, "该报告检测成功！！！");
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return R.success(new DetectionResultModel(true, "该报告检测成功！！！"));
+        return Result.success(new DetectionResultModel(true, "该报告检测成功！！！"));
     }
 
     @ApiOperation("删除检测报告")

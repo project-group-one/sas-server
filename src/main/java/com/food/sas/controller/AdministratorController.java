@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.food.sas.data.dto.AdministratorDTO;
 import com.food.sas.data.dto.AdministratorRequest;
 import com.food.sas.data.dto.UserDTO;
-import com.food.sas.data.response.R;
+import com.food.sas.data.response.Result;
 import com.food.sas.service.IAdministratorService;
 import com.food.sas.service.IUserService;
 import com.google.common.cache.LoadingCache;
@@ -52,7 +52,7 @@ public class AdministratorController {
                         response.setStatusCode(HttpStatus.FORBIDDEN);
                         response.getHeaders().setContentType(MediaType.TEXT_PLAIN);
                         DataBufferFactory dataBufferFactory = response.bufferFactory();
-                        DataBuffer buffer = dataBufferFactory.wrap(JSON.toJSONString(R.forbidden()).getBytes(
+                        DataBuffer buffer = dataBufferFactory.wrap(JSON.toJSONString(Result.forbidden()).getBytes(
                                 Charset.defaultCharset()));
                         return response.writeWith(Mono.just(buffer))
                                 .doOnError(error -> DataBufferUtils.release(buffer));

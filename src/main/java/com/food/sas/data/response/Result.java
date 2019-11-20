@@ -16,7 +16,7 @@ import java.util.Optional;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class R<T> implements Serializable {
+public class Result<T> implements Serializable {
 
     /**
      * 是否成功
@@ -60,23 +60,23 @@ public class R<T> implements Serializable {
         }
     }
 
-    private R(IResultCode resultCode) {
+    private Result(IResultCode resultCode) {
         this(resultCode, resultCode.getMsg(), null, null);
     }
 
-    private R(IResultCode resultCode, String msg) {
+    private Result(IResultCode resultCode, String msg) {
         this(resultCode, msg, null, null);
     }
 
-    private R(IResultCode resultCode, T data) {
+    private Result(IResultCode resultCode, T data) {
         this(resultCode, resultCode.getMsg(), data, null);
     }
 
-    public R(IResultCode resultCode, T data, Page page) {
+    public Result(IResultCode resultCode, T data, Page page) {
         this(resultCode, resultCode.getMsg(), data, page);
     }
 
-    private R(IResultCode resultCode, String msg, T data, Page page) {
+    private Result(IResultCode resultCode, String msg, T data, Page page) {
         this.code = resultCode.getCode();
         this.msg = msg;
         this.data = data;
@@ -86,8 +86,8 @@ public class R<T> implements Serializable {
         }
     }
 
-    public static R forbidden() {
-        return R.fail(SystemCode.REQ_REJECT, "账号或密码错误");
+    public static Result forbidden() {
+        return Result.fail(SystemCode.REQ_REJECT, "账号或密码错误");
     }
 
     /**
@@ -96,7 +96,7 @@ public class R<T> implements Serializable {
      * @param result Result
      * @return 是否成功
      */
-    public static boolean isSuccess(@Nullable R<?> result) {
+    public static boolean isSuccess(@Nullable Result<?> result) {
         return Optional.ofNullable(result)
                 .map(r -> r.code)
                 .map(code -> SystemCode.SUCCESS.code == code)
@@ -109,8 +109,8 @@ public class R<T> implements Serializable {
      * @param result Result
      * @return 是否成功
      */
-    public static boolean isNotSuccess(@Nullable R<?> result) {
-        return !R.isSuccess(result);
+    public static boolean isNotSuccess(@Nullable Result<?> result) {
+        return !Result.isSuccess(result);
     }
 
     /**
@@ -121,7 +121,7 @@ public class R<T> implements Serializable {
      * @return 泛型对象
      */
     @Nullable
-    public static <T> T getData(@Nullable R<T> result) {
+    public static <T> T getData(@Nullable Result<T> result) {
         return Optional.ofNullable(result)
                 .filter(r -> r.success)
                 .map(x -> x.data)
@@ -134,8 +134,8 @@ public class R<T> implements Serializable {
      * @param <T> 泛型标记
      * @return Result
      */
-    public static <T> R<T> success() {
-        return new R<>(SystemCode.SUCCESS);
+    public static <T> Result<T> success() {
+        return new Result<>(SystemCode.SUCCESS);
     }
 
     /**
@@ -145,8 +145,8 @@ public class R<T> implements Serializable {
      * @param <T>  泛型标记
      * @return Result
      */
-    public static <T> R<T> success(@Nullable T data) {
-        return new R<>(SystemCode.SUCCESS, data);
+    public static <T> Result<T> success(@Nullable T data) {
+        return new Result<>(SystemCode.SUCCESS, data);
     }
 
 
@@ -157,8 +157,8 @@ public class R<T> implements Serializable {
      * @param <T>  泛型标记
      * @return Result
      */
-    public static <T> R<T> success(@Nullable T data, Page page) {
-        return new R<>(SystemCode.SUCCESS, data);
+    public static <T> Result<T> success(@Nullable T data, Page page) {
+        return new Result<>(SystemCode.SUCCESS, data);
     }
 
     /**
@@ -169,8 +169,8 @@ public class R<T> implements Serializable {
      * @param <T>    泛型标记
      * @return Result
      */
-    public static <T> R<T> status(boolean status, String msg) {
-        return status ? R.success() : R.fail(msg);
+    public static <T> Result<T> status(boolean status, String msg) {
+        return status ? Result.success() : Result.fail(msg);
     }
 
     /**
@@ -181,8 +181,8 @@ public class R<T> implements Serializable {
      * @param <T>    泛型标记
      * @return Result
      */
-    public static <T> R<T> status(boolean status, IResultCode sCode) {
-        return status ? R.success() : R.fail(sCode);
+    public static <T> Result<T> status(boolean status, IResultCode sCode) {
+        return status ? Result.success() : Result.fail(sCode);
     }
 
     /**
@@ -192,8 +192,8 @@ public class R<T> implements Serializable {
      * @param <T> 泛型标记
      * @return {Result}
      */
-    public static <T> R<T> fail(String msg) {
-        return new R<>(SystemCode.FAILURE, msg);
+    public static <T> Result<T> fail(String msg) {
+        return new Result<>(SystemCode.FAILURE, msg);
     }
 
     /**
@@ -203,8 +203,8 @@ public class R<T> implements Serializable {
      * @param <T>   泛型标记
      * @return {Result}
      */
-    public static <T> R<T> fail(IResultCode rCode) {
-        return new R<>(rCode);
+    public static <T> Result<T> fail(IResultCode rCode) {
+        return new Result<>(rCode);
     }
 
     /**
@@ -215,8 +215,8 @@ public class R<T> implements Serializable {
      * @param <T>   泛型标记
      * @return {Result}
      */
-    public static <T> R<T> fail(IResultCode rCode, String msg) {
-        return new R<>(rCode, msg);
+    public static <T> Result<T> fail(IResultCode rCode, String msg) {
+        return new Result<>(rCode, msg);
     }
 
     /**
@@ -224,8 +224,8 @@ public class R<T> implements Serializable {
      *
      * @param result R
      */
-    public static void throwOnFail(R<?> result) {
-        if (R.isNotSuccess(result)) {
+    public static void throwOnFail(Result<?> result) {
+        if (Result.isNotSuccess(result)) {
             throw new BadException(result);
         }
     }
@@ -236,8 +236,8 @@ public class R<T> implements Serializable {
      * @param result R
      * @param rCode  异常枚举
      */
-    public static void throwOnFail(R<?> result, IResultCode rCode) {
-        if (R.isNotSuccess(result)) {
+    public static void throwOnFail(Result<?> result, IResultCode rCode) {
+        if (Result.isNotSuccess(result)) {
             throw new BadException(rCode);
         }
     }
@@ -249,8 +249,8 @@ public class R<T> implements Serializable {
      * @param rCode  异常枚举
      * @param msg    失败信息
      */
-    public static void throwOnFail(R<?> result, IResultCode rCode, String msg) {
-        if (R.isNotSuccess(result)) {
+    public static void throwOnFail(Result<?> result, IResultCode rCode, String msg) {
+        if (Result.isNotSuccess(result)) {
             throw new BadException(rCode, msg);
         }
     }

@@ -2,7 +2,7 @@ package com.food.sas.controller;
 
 import com.food.sas.data.dto.CommentRequest;
 import com.food.sas.data.dto.NewsDTO;
-import com.food.sas.data.response.R;
+import com.food.sas.data.response.Result;
 import com.food.sas.service.INewsService;
 import com.food.sas.service.IUserService;
 import io.swagger.annotations.Api;
@@ -37,7 +37,7 @@ public class NewsController {
 
     @ApiOperation("获得单个新闻内容")
     @GetMapping("/{id}")
-    public R<NewsDTO> getNewsById(@PathVariable Long id) throws IOException {
+    public Result<NewsDTO> getNewsById(@PathVariable Long id) throws IOException {
         NewsDTO dto = newsService.getNewsById(id);
         if (dto.getStoreUrl() != null) {
             Path path = Paths.get(dto.getStoreUrl());
@@ -46,15 +46,15 @@ public class NewsController {
                 dto.setContent(new String(data));
             }
         }
-        return R.success(dto);
+        return Result.success(dto);
     }
 
     @ApiOperation("获取新闻资讯列表")
     @GetMapping
-    public R<List<NewsDTO>> getNewsList(NewsDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
-                                        @RequestParam(value = "size", defaultValue = "20") int size) {
+    public Result<List<NewsDTO>> getNewsList(NewsDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
+                                             @RequestParam(value = "size", defaultValue = "20") int size) {
         Page<NewsDTO> result = newsService.getNewsList(dto, PageRequest.of(Math.max(page - 1, 0), size));
-        return R.success(result.getContent(), result);
+        return Result.success(result.getContent(), result);
     }
 
 

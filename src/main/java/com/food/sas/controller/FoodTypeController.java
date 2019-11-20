@@ -2,7 +2,7 @@ package com.food.sas.controller;
 
 import com.food.sas.data.dto.FoodTypeModel;
 import com.food.sas.data.dto.FoodTypeRequest;
-import com.food.sas.data.response.R;
+import com.food.sas.data.response.Result;
 import com.food.sas.service.FoodTypeService;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -34,13 +34,13 @@ public class FoodTypeController {
 
     @ApiOperation("食品类别树")
     @GetMapping
-    public R<Flux<FoodTypeModel>> queryFoodType() {
-        return R.success(foodTypeService.queryFoodType());
+    public Result<Flux<FoodTypeModel>> queryFoodType() {
+        return Result.success(foodTypeService.queryFoodType());
     }
 
     @ApiOperation("修改食品树")
     @PutMapping("/{id}")
-    public R<Mono<Long>> modifyFoodType(@RequestBody FoodTypeRequest body) {
-        return R.success(foodTypeService.modifyFoodType(body));
+    public Result<Mono<Long>> modifyFoodType(@RequestBody FoodTypeRequest body) {
+        return Result.success(foodTypeService.modifyFoodType(body));
     }
 }

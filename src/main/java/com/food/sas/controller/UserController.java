@@ -3,7 +3,7 @@ package com.food.sas.controller;
 import com.food.sas.config.SmsSender;
 import com.food.sas.data.dto.UserDTO;
 import com.food.sas.data.entity.VerificationCode;
-import com.food.sas.data.response.R;
+import com.food.sas.data.response.Result;
 import com.food.sas.exception.BadException;
 import com.food.sas.security.service.MyMapReactiveUserDetailsService;
 import com.food.sas.service.IUserService;
@@ -73,31 +73,31 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("根据id查询")
     @GetMapping("/{id}")
-    public R<UserDTO> searchUser(@PathVariable Long id, @ApiIgnore Authentication authentication, @ApiIgnore ServerWebExchange exchange) {
+    public Result<UserDTO> searchUser(@PathVariable Long id, @ApiIgnore Authentication authentication, @ApiIgnore ServerWebExchange exchange) {
         if (authentication == null && !authentication.isAuthenticated()) {
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-            return R.fail("用户未登录");
+            return Result.fail("用户未登录");
         }
-        return R.success(userService.searchUserById(id));
+        return Result.success(userService.searchUserById(id));
     }
 
     @ApiOperation("登录后调用 获取必要参数")
     @GetMapping("/current")
-    public R<UserDTO> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
+    public Result<UserDTO> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
         if (authentication != null && authentication.isAuthenticated()) {
-            return R.success(userService.findUserByUsername(authentication.getName()));
+            return Result.success(userService.findUserByUsername(authentication.getName()));
         }
         exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-        return R.fail("用户未登录");
+        return Result.fail("用户未登录");
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("用户列表查询 查询参数 username(半模糊) address type name(半模糊)")
     @GetMapping
-    public Mono<R<List<UserDTO>>> getUserPages(UserDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
-                                               @RequestParam(value = "size", defaultValue = "20") int size) {
+    public Mono<Result<List<UserDTO>>> getUserPages(UserDTO dto, @RequestParam(value = "current", defaultValue = "1") int page,
+                                                    @RequestParam(value = "size", defaultValue = "20") int size) {
         Page<UserDTO> result = userService.getUserPage(dto, PageRequest.of(Math.max(page - 1, 0), size));
-        return Mono.just(R.success(result.getContent(), result));
+        return Mono.just(Result.success(result.getContent(), result));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -249,7 +249,7 @@ public class UserController {
 
     @ApiOperation("修改密码")
     @PutMapping("/pwd")
-    public R<Mono<UserDetails>> modifyPassword(Authentication authentication, @RequestParam String oPwd, @RequestParam String nPwd) {
+    public Result<Mono<UserDetails>> modifyPassword(Authentication authentication, @RequestParam String oPwd, @RequestParam String nPwd) {
         if (authentication.isAuthenticated()) {
             //判断旧密码是否相同
             UserDTO user = userService.findUserByUsername(authentication.getName());
@@ -257,17 +257,17 @@ public class UserController {
             if (b) {
                 user.setPassword(SALT + encoder.encode(nPwd));
                 userService.createUser(user);
-                R.success(userDetailsService.updatePassword(new com.food.sas.security.User(user.getId(), user.getType(), user.getUsername(), user.getPassword().substring(5), AuthorityUtils.createAuthorityList(user.getRole().split(","))), user.getPassword().substring(5)));
+                Result.success(userDetailsService.updatePassword(new com.food.sas.security.User(user.getId(), user.getType(), user.getUsername(), user.getPassword().substring(5), AuthorityUtils.createAuthorityList(user.getRole().split(","))), user.getPassword().substring(5)));
             }
         }
-        return R.fail("修改密码失败");
+        return Result.fail("修改密码失败");
     }
 
     @ApiOperation("获取没有组织的用户")
     @GetMapping("/not-org")
-    public Mono<R<List<UserDTO>>> getUsersHasNotOrg() {
+    public Mono<Result<List<UserDTO>>> getUsersHasNotOrg() {
         List<UserDTO> users = userService.getUsersHasNoOrg();
-        return Mono.just(R.success(users));
+        return Mono.just(Result.success(users));
     }
 
 
