@@ -72,7 +72,7 @@ public class Result<T> implements Serializable {
         this(resultCode, resultCode.getMsg(), data, null);
     }
 
-    public Result(IResultCode resultCode, T data, Page page) {
+    private Result(IResultCode resultCode, T data, Page page) {
         this(resultCode, resultCode.getMsg(), data, page);
     }
 
@@ -158,7 +158,7 @@ public class Result<T> implements Serializable {
      * @return Result
      */
     public static <T> Result<T> success(@Nullable T data, Page page) {
-        return new Result<>(SystemCode.SUCCESS, data);
+        return new Result<>(SystemCode.SUCCESS, data, page);
     }
 
     /**
