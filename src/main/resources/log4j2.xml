@@ -5,8 +5,7 @@
         <Property name="logDir">logs</Property>
         <Property name="splitSize">30 MB</Property>
         <Property name="PID">????</Property>
-        <Property name="LOG_PATTERN">%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{%5p} %clr{${sys:PID}}{magenta}
-            %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{:}{faint} %m%n%xwEx
+        <Property name="LOG_PATTERN">%clr{%d{yyyy-MM-dd HH:mm:ss.SSS}}{faint} %clr{%5p} %clr{${sys:PID}}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{:}{faint} %m%n%xwEx
         </Property>
     </Properties>
 
@@ -66,13 +65,12 @@
     </Appenders>
 
     <Loggers>
-        <Root level="debug" includeLocation="true">
+        <Root level="INFO" includeLocation="true">
             <AppenderRef ref="console"/>
             <AppenderRef ref="infoLog"/>
             <AppenderRef ref="errorLog"/>
         </Root>
         <AsyncLogger name="com.food.sas" level="INFO" includeLocation="true">
-            <AppenderRef ref="console"/>
             <AppenderRef ref="infoLog"/>
             <AppenderRef ref="errorLog"/>
         </AsyncLogger>
