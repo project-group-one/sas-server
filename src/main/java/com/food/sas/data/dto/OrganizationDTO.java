@@ -18,6 +18,8 @@ public class OrganizationDTO implements Serializable {
 
     private String name;
 
+    private String credential;
+
     private Date createDate;
 
     private Long creator;
