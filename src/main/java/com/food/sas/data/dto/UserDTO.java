@@ -47,4 +47,7 @@ public class UserDTO implements Serializable {
 
     @ApiModelProperty("地址")
     private String address;
+
+    @ApiModelProperty("当前用户是否已审核")
+    private Boolean verified;
 }

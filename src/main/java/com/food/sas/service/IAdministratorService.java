@@ -14,5 +14,5 @@ public interface IAdministratorService {
 
     boolean verifyUser(Integer id);
 
-    UserVerificationDTO getUserVerification(Integer i);
+    UserVerificationDTO getUserVerification(Long i);
 }

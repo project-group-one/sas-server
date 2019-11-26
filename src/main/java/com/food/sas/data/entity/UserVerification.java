@@ -27,6 +27,10 @@ public class UserVerification implements Serializable {
 
     private String path;
 
+    private String frontPath;
+
+    private String backPath;
+
     private String remark;
 
     @Version
