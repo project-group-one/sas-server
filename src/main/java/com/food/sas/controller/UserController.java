@@ -89,7 +89,7 @@ public class UserController {
     public Mono<Result<UserDTO>> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
         if (authentication != null && authentication.isAuthenticated()) {
             UserDTO result = userService.findUserByUsername(authentication.getName());
-            result.setVerified((result.getStatus() | 4) == result.getStatus());
+            result.setVerified((result.getStatus() | 8) == result.getStatus());
             return Mono.just(Result.success(result));
         }
         exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
