@@ -1,6 +1,7 @@
 package com.food.sas.service;
 
 import com.food.sas.data.dto.UserDTO;
+import com.food.sas.data.dto.UserVerificationDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -34,4 +35,6 @@ public interface IUserService {
     void thawUser(Long mId);
 
     List<UserDTO> getUsersHasNoOrg();
+
+    Integer saveUserVerification(UserVerificationDTO body);
 }

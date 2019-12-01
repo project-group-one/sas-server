@@ -78,17 +78,17 @@ public class AdministratorController {
         return Mono.just(null);
     }
 
-    @ApiOperation("用户审核")
-    @PutMapping("/user/verfy")
-    public Mono<Result<Boolean>> verifyUser(@RequestBody Mono<Integer> id) {
-        return id.map(i -> Result.success(administratorService.verifyUser(i))).doOnError(e -> Result.fail(e.getMessage()));
+    @ApiOperation("用户审核 路径审核信息id")
+    @PutMapping("/user/verfy/{id}")
+    public Mono<Result<Boolean>> verifyUser(@PathVariable Integer id) {
+        return Mono.just(id).map(i -> Result.success(administratorService.verifyUser(i))).doOnError(e -> Result.fail(e.getMessage()));
 //        return Mono.just(Result.success());
     }
 
-    @ApiOperation("获取用户审核详情")
-    @GetMapping("/user/verification/{id}")
-    public Mono<Result<UserVerificationDTO>> userVerification(@PathVariable Mono<Integer> id) {
-        return id.map(i -> Result.success(administratorService.getUserVerification(i))).doOnError(e -> Result.fail(e.getMessage()));
+    @ApiOperation("获取用户审核详情 路径为待审核用户id")
+    @GetMapping("/user/verification/{userId}")
+    public Mono<Result<UserVerificationDTO>> userVerification(@PathVariable Long userId) {
+        return Mono.just(userId).map(i -> Result.success(administratorService.getUserVerification(i))).doOnError(e -> Result.fail(e.getMessage()));
     }
 
 

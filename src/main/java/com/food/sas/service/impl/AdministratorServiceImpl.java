@@ -3,12 +3,14 @@ package com.food.sas.service.impl;
 import com.food.sas.data.dto.AdministratorDTO;
 import com.food.sas.data.dto.UserVerificationDTO;
 import com.food.sas.data.entity.QAdministrator;
+import com.food.sas.data.entity.QUserVerification;
 import com.food.sas.data.entity.User;
 import com.food.sas.data.entity.UserVerification;
 import com.food.sas.data.repository.AdministratorRepository;
 import com.food.sas.data.repository.UserRepository;
 import com.food.sas.data.repository.UserVerificationRepository;
 import com.food.sas.mapper.AdministratorMapper;
+import com.food.sas.mapper.UserVerificationMapper;
 import com.food.sas.service.IAdministratorService;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -67,7 +69,13 @@ public class AdministratorServiceImpl implements IAdministratorService {
     }
 
     @Override
-    public UserVerificationDTO getUserVerification(Integer i) {
+    public UserVerificationDTO getUserVerification(Long i) {
+        QUserVerification qUserVerification = QUserVerification.userVerification;
+        Optional<UserVerification> optional =
+                userVerificationRepository.findOne(qUserVerification.userId.eq(i).and(qUserVerification.status.eq(0)));
+        if (optional.isPresent()) {
+            return UserVerificationMapper.MAPPER.fromEntity(optional.get());
+        }
         return null;
     }
 }

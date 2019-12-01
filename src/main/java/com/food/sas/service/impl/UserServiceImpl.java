@@ -1,10 +1,13 @@
 package com.food.sas.service.impl;
 
 import com.food.sas.data.dto.UserDTO;
+import com.food.sas.data.dto.UserVerificationDTO;
 import com.food.sas.data.entity.QUser;
 import com.food.sas.data.entity.User;
 import com.food.sas.data.repository.UserRepository;
+import com.food.sas.data.repository.UserVerificationRepository;
 import com.food.sas.mapper.UserMapper;
+import com.food.sas.mapper.UserVerificationMapper;
 import com.food.sas.service.IUserService;
 import com.food.sas.util.BooleanBuilderHelper;
 import com.querydsl.core.BooleanBuilder;
@@ -34,6 +37,9 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserVerificationRepository userVerificationRepository;
 
     @Autowired
     @PersistenceContext
@@ -163,6 +169,11 @@ public class UserServiceImpl implements IUserService {
     public List<UserDTO> getUsersHasNoOrg() {
         return userRepository.findAll().parallelStream().filter(o -> Objects.isNull(o.getOrganization()))
                 .map(o -> Mappers.getMapper(UserMapper.class).fromEntity(o)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Integer saveUserVerification(UserVerificationDTO body) {
+        return userVerificationRepository.saveAndFlush(UserVerificationMapper.MAPPER.toEntity(body)).getId();
     }
 
 }

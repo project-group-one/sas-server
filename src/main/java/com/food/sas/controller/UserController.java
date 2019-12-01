@@ -2,6 +2,8 @@ package com.food.sas.controller;
 
 import com.food.sas.config.SmsSender;
 import com.food.sas.data.dto.UserDTO;
+import com.food.sas.data.dto.UserVerificationDTO;
+import com.food.sas.data.entity.UserVerification;
 import com.food.sas.data.entity.VerificationCode;
 import com.food.sas.data.response.Result;
 import com.food.sas.exception.BadException;
@@ -27,6 +29,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -85,7 +88,9 @@ public class UserController {
     @GetMapping("/current")
     public Mono<Result<UserDTO>> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
         if (authentication != null && authentication.isAuthenticated()) {
-            return Mono.just(Result.success(userService.findUserByUsername(authentication.getName())));
+            UserDTO result = userService.findUserByUsername(authentication.getName());
+            result.setVerified((result.getStatus() | 4) == result.getStatus());
+            return Mono.just(Result.success(result));
         }
         exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
         return Mono.just(Result.fail("用户未登录"));
@@ -267,6 +272,21 @@ public class UserController {
     public Mono<Result<List<UserDTO>>> getUsersHasNotOrg() {
         List<UserDTO> users = userService.getUsersHasNoOrg();
         return Mono.just(Result.success(users));
+    }
+
+    @ApiOperation("用户上传审核材料")
+    @PostMapping("/verification")
+    public Mono<Result<Integer>> saveUserVerification(@RequestBody UserVerificationDTO body, Authentication authentication) {
+
+        if (StringUtils.isBlank(body.getFrontPath()) || StringUtils.isBlank(body.getBackPath())) {
+            return Mono.just(Result.fail("缺少front 和 back path"));
+        }
+
+        Long creator = userService.findUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername()).getId();
+        body.setUserId(creator);
+        body.setStatus(0);
+        return Mono.just(Result.success(userService.saveUserVerification(body)))
+                .onErrorReturn(Result.<Integer>fail("用户审核材料新增失败"));
     }
 
 
