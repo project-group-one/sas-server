@@ -73,22 +73,22 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @ApiOperation("根据id查询")
     @GetMapping("/{id}")
-    public Result<UserDTO> searchUser(@PathVariable Long id, @ApiIgnore Authentication authentication, @ApiIgnore ServerWebExchange exchange) {
-        if (authentication == null && !authentication.isAuthenticated()) {
+    public Mono<Result<UserDTO>> searchUser(@PathVariable Long id, @ApiIgnore Authentication authentication, @ApiIgnore ServerWebExchange exchange) {
+        if (authentication == null || (!authentication.isAuthenticated())) {
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-            return Result.fail("用户未登录");
+            return Mono.just(Result.fail("用户未登录"));
         }
-        return Result.success(userService.searchUserById(id));
+        return Mono.just(Result.success(userService.searchUserById(id)));
     }
 
     @ApiOperation("登录后调用 获取必要参数")
     @GetMapping("/current")
-    public Result<UserDTO> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
+    public Mono<Result<UserDTO>> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
         if (authentication != null && authentication.isAuthenticated()) {
-            return Result.success(userService.findUserByUsername(authentication.getName()));
+            return Mono.just(Result.success(userService.findUserByUsername(authentication.getName())));
         }
         exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-        return Result.fail("用户未登录");
+        return Mono.just(Result.fail("用户未登录"));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -157,7 +157,6 @@ public class UserController {
         userService.thawUser(mId);
         return Mono.empty();
     }
-
 
 
     @PreAuthorize("hasRole('ADMIN')")

@@ -146,7 +146,9 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserDTO searchUserById(Long id) {
-        return Mappers.getMapper(UserMapper.class).fromEntity(userRepository.findById(id).get());
+        final UserDTO[] model = {null};
+        userRepository.findById(id).ifPresent(o -> model[0] = Mappers.getMapper(UserMapper.class).fromEntity(o));
+        return model[0];
     }
 
     @Override
