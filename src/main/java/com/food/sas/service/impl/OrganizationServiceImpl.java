@@ -7,6 +7,7 @@ import com.food.sas.data.dto.OrganizationDTO;
 import com.food.sas.data.dto.OrganizationModel;
 import com.food.sas.data.entity.Organization;
 import com.food.sas.data.entity.QOrganization;
+import com.food.sas.data.entity.QUser;
 import com.food.sas.data.entity.User;
 import com.food.sas.data.repository.OrganizationRepository;
 import com.food.sas.data.repository.UserRepository;
@@ -16,6 +17,7 @@ import com.food.sas.mapper.OrganizationMapper;
 import com.food.sas.service.IOrganizationService;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
@@ -44,6 +46,8 @@ public class OrganizationServiceImpl implements IOrganizationService {
     private final UserRepository userRepository;
 
     private final EntityManager em;
+
+    private JPAQueryFactory jpaQueryFactory;
 
     @Override
     public OrganizationDTO searchOrganization(Long id) {
@@ -132,5 +136,16 @@ public class OrganizationServiceImpl implements IOrganizationService {
         organization.setStatus(status);
         organization.setErrorMsg(errorMsg);
         organizationRepository.save(organization);
+    }
+
+    @Override
+    public OrganizationModel getOrganizationByUser(Long userId) {
+        QOrganization organization = QOrganization.organization;
+        QUser user = QUser.user;
+        BooleanExpression eq = user.id.eq(userId);
+        Organization org = jpaQueryFactory.selectFrom(organization)
+                .leftJoin(organization.users, user)
+                .where(eq).fetchFirst();
+        return Mappers.getMapper(OrganizationMapper.class).toModel(org);
     }
 }

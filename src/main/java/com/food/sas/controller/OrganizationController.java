@@ -88,4 +88,10 @@ public class OrganizationController {
         service.auditOrganization(id, status, errorMsg);
         return Mono.empty();
     }
+
+    @GetMapping("/users/{userId}")
+    public Mono<Result<OrganizationModel>> getOrganizationByUser(@PathVariable("userId") Long userId) {
+        OrganizationModel model = service.getOrganizationByUser(userId);
+        return Mono.just(Result.success(model));
+    }
 }

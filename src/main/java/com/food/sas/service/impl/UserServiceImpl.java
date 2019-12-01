@@ -99,7 +99,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public boolean validate(Long id, Integer type) {
         Optional<User> optional = userRepository.findById(id);
-        if (optional.isPresent() && optional.get().getType() > type) {
+        if (optional.isPresent() && optional.get().getType() >= type) {
             return true;
         }
         return false;

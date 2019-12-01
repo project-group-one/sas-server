@@ -22,4 +22,7 @@ public interface OrganizationMapper {
     List<OrganizationDTO> fromEntitys(List<Organization> entitys);
 
     List<OrganizationModel> toModels(List<Organization> data);
+
+    OrganizationModel toModel(Organization data);
+
 }

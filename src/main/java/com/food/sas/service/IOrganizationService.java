@@ -7,8 +7,6 @@ import com.food.sas.data.dto.OrganizationModel;
 import com.food.sas.enums.StatusEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author Created by ygdxd_admin at 2019-01-06 10:34 PM
@@ -27,5 +25,7 @@ public interface IOrganizationService {
 
     void addUserToOrganization(AddUserToOrganizationRequest request);
 
-    void auditOrganization(Long id, StatusEnum status,String errorMsg);
+    void auditOrganization(Long id, StatusEnum status, String errorMsg);
+
+    OrganizationModel getOrganizationByUser(Long userId);
 }
