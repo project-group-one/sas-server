@@ -89,6 +89,7 @@ public class OrganizationController {
         return Mono.empty();
     }
 
+    @ApiOperation("查询用户组织信息")
     @GetMapping("/users/{userId}")
     public Mono<Result<OrganizationModel>> getOrganizationByUser(@PathVariable("userId") Long userId) {
         OrganizationModel model = service.getOrganizationByUser(userId);
