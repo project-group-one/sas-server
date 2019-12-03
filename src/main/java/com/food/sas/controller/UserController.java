@@ -212,7 +212,7 @@ public class UserController {
             throw new BadException("注册失败");
         }
         userDTO.setStatus(0);
-        userDTO.setRole("CLIENT");
+        userDTO.setRole("ROLE_CLIENT");
         userDTO.setId(null);
         userDTO.setType(0);
         userDTO.setPassword(SALT + encoder.encode(userDTO.getPassword()));
