@@ -220,7 +220,7 @@ public class UserController {
         verificationCode.setRegistered(1);
         verificationCodeService.saveOrUpdateVerificationCode(verificationCode);
 
-        userDTO.setPassword(encoder.encode(userDTO.getPassword()));
+        userDTO.setPassword(userDTO.getPassword());
         userDetailsService.addUserDetail(userDTO);
         return Mono.empty();
     }
