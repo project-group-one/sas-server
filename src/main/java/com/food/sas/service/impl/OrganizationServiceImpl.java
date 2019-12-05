@@ -15,6 +15,7 @@ import com.food.sas.enums.StatusEnum;
 import com.food.sas.exception.BadException;
 import com.food.sas.mapper.OrganizationMapper;
 import com.food.sas.service.IOrganizationService;
+import com.google.common.collect.Sets;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -73,18 +74,21 @@ public class OrganizationServiceImpl implements IOrganizationService {
     }
 
     @Override
-    public void createOrganization(CreateOrganizationRequest body, Long creator) {
+    public OrganizationModel createOrganization(CreateOrganizationRequest body, Long creator) {
         boolean existsByName = organizationRepository.existsByName(body.getName());
         if (existsByName) {
             throw new BadException("已经存在该组织名称");
         }
+        User user = userRepository.findById(creator).get();
         Organization organization = Organization.builder()
                 .name(body.getName())
                 .creator(creator)
+                .users(Sets.newHashSet(user))
                 .credential(body.getCredential())
                 .status(StatusEnum.WAIT_AUDIT)
                 .build();
-        organizationRepository.saveAndFlush(organization);
+        Organization doc = organizationRepository.saveAndFlush(organization);
+        return Mappers.getMapper(OrganizationMapper.class).toModel(doc);
     }
 
     @Override

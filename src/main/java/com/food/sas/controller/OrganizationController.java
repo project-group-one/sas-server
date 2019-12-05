@@ -53,10 +53,10 @@ public class OrganizationController {
 
     @ApiOperation("新增组织")
     @PostMapping
-    public Mono<Void> createOrganization(@RequestBody @Valid CreateOrganizationRequest body, Authentication authentication) {
+    public Mono<OrganizationModel> createOrganization(@RequestBody @Valid CreateOrganizationRequest body, Authentication authentication) {
         Long creator = userService.findUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername()).getId();
-        service.createOrganization(body, creator);
-        return Mono.empty();
+        OrganizationModel organization = service.createOrganization(body, creator);
+        return Mono.just(organization);
     }
 
     @ApiOperation("修改组织")

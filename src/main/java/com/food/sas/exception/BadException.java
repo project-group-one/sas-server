@@ -2,6 +2,7 @@ package com.food.sas.exception;
 
 import com.food.sas.data.response.IResultCode;
 import com.food.sas.data.response.Result;
+import com.food.sas.data.response.SystemCode;
 
 import javax.annotation.Nullable;
 
@@ -30,7 +31,7 @@ public class BadException extends RuntimeException {
 
     public BadException(String message) {
         super(message);
-        this.result = null;
+        this.result = Result.fail(SystemCode.BAD_REQUEST, message);
     }
 
     public BadException(Throwable cause) {
