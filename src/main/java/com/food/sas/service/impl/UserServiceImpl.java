@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements IUserService {
 
-    private static final int FREEZED_STATUS = 1;
+    private static final int FREEZED_STATUS = 127;
 
     @Autowired
     private UserRepository userRepository;
@@ -136,7 +136,9 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void freezeUser(Long id) {
         userRepository.findById(id).ifPresent(user -> {
-            user.setStatus(FREEZED_STATUS);
+            if (user.getStatus() % 2 == 0) {
+                user.setStatus(user.getStatus() + 1);
+            }
             userRepository.saveAndFlush(user);
         });
     }
@@ -163,6 +165,8 @@ public class UserServiceImpl implements IUserService {
     public UserDTO thawUser(Long mId) {
         Optional<User> optional = userRepository.findById(mId);
         if (optional.isPresent()) {
+            User user = optional.get();
+            user.setStatus(user.getStatus() & (FREEZED_STATUS - 1));
             return Mappers.getMapper(UserMapper.class).fromEntity(userRepository.saveAndFlush(optional.get()));
         }
         throw new RuntimeException("解冻用户失败");
