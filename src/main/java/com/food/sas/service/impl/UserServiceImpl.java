@@ -3,7 +3,9 @@ package com.food.sas.service.impl;
 import com.food.sas.data.dto.UserDTO;
 import com.food.sas.data.dto.UserVerificationDTO;
 import com.food.sas.data.entity.QUser;
+import com.food.sas.data.entity.QUserVerification;
 import com.food.sas.data.entity.User;
+import com.food.sas.data.entity.UserVerification;
 import com.food.sas.data.repository.UserRepository;
 import com.food.sas.data.repository.UserVerificationRepository;
 import com.food.sas.mapper.UserMapper;
@@ -173,6 +175,14 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Integer saveUserVerification(UserVerificationDTO body) {
+        Optional<UserVerification> optional = userVerificationRepository.findOne(QUserVerification.userVerification.userId.eq(body.getUserId()));
+        if (optional.isPresent()) {
+            UserVerification entity = optional.get();
+            body.setId(entity.getId());
+            body.setAuditTime(null);
+            body.setStatus(entity.getStatus());
+            body.setCreateTime(entity.getCreateTime());
+        }
         return userVerificationRepository.saveAndFlush(UserVerificationMapper.MAPPER.toEntity(body)).getId();
     }
 

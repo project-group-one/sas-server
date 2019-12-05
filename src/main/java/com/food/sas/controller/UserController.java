@@ -1,5 +1,6 @@
 package com.food.sas.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.food.sas.config.SmsSender;
 import com.food.sas.data.dto.UserDTO;
 import com.food.sas.data.dto.UserVerificationDTO;
@@ -7,6 +8,8 @@ import com.food.sas.data.entity.UserVerification;
 import com.food.sas.data.entity.VerificationCode;
 import com.food.sas.data.response.Result;
 import com.food.sas.exception.BadException;
+import com.food.sas.security.SecurityConfiguration;
+import com.food.sas.security.jwt.JwtBody;
 import com.food.sas.security.service.MyMapReactiveUserDetailsService;
 import com.food.sas.service.IUserService;
 import com.food.sas.service.IVerificationCodeService;
@@ -24,6 +27,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.jwt.JwtHelper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -31,6 +35,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -89,7 +94,7 @@ public class UserController {
     public Mono<Result<UserDTO>> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
         if (authentication != null && authentication.isAuthenticated()) {
             UserDTO result = userService.findUserByUsername(authentication.getName());
-            result.setVerified((result.getStatus() | 4) == result.getStatus());
+            result.setVerified((result.getStatus() & 8) == result.getStatus());
             return Mono.just(Result.success(result));
         }
         exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
@@ -197,32 +202,41 @@ public class UserController {
 
     @ApiOperation("手机注册")
     @PostMapping("/phone")
-    public Mono<Void> phoneRegister(@RequestParam String code, @RequestBody UserDTO userDTO) {
+    public Mono<Result<?>> phoneRegister(@RequestParam String code, @RequestBody UserDTO userDTO) {
 
         if (StringUtils.isBlank(userDTO.getUsername()) || StringUtils.isBlank(userDTO.getPassword()) || userDTO.getPhone() == null) {
-            throw new BadException("参数错误");
+            return Mono.just(Result.fail("账号密码或手机号为空"));
         }
 
         if (null != userService.findUserByUsername(userDTO.getUsername())) {
-            return Mono.error(new RuntimeException("用户名已被注册！"));
+            return Mono.just(Result.fail("用户名已被注册！"));
         }
 
         VerificationCode verificationCode = verificationCodeService.findVerificationCodeByPhone(userDTO.getPhone());
         if (verificationCode == null || !verificationCode.getPhone().equals(userDTO.getPhone()) || verificationCode.getRegistered() > 0 || verificationCode.getExpired().isBefore(LocalDateTime.now()) || !verificationCode.getCode().equals(code)) {
-            throw new BadException("注册失败");
+            Mono.just(Result.fail("注册失败"));
         }
+        String password = SALT + encoder.encode(userDTO.getPassword());
         userDTO.setStatus(0);
-        userDTO.setRole("CLIENT");
+        userDTO.setRole("ROLE_CLIENT");
         userDTO.setId(null);
         userDTO.setType(0);
-        userDTO.setPassword(SALT + encoder.encode(userDTO.getPassword()));
+        userDTO.setPassword(password);
         userService.createUser(userDTO);
         verificationCode.setRegistered(1);
         verificationCodeService.saveOrUpdateVerificationCode(verificationCode);
 
-        userDTO.setPassword(encoder.encode(userDTO.getPassword()));
+        userDTO.setPassword(password.substring(5));
         userDetailsService.addUserDetail(userDTO);
-        return Mono.empty();
+
+        UserDetails userDetails = new User(userDTO.getUsername(), password.substring(5), AuthorityUtils.createAuthorityList(userDTO.getRole()));
+        return Mono.just(Result.success(
+                JwtBody.newBuiler()
+                        .setAccessToken(JwtHelper.encode(JSON.toJSONString(userDetails), SecurityConfiguration.HMAC).getEncoded())
+                        .setExpired(3600L + LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli())
+                        .setRefreshToken(null)
+                        .setUserId(userDTO.getId())
+                        .setUserType(userDTO.getType()).builde()));
     }
 
 
