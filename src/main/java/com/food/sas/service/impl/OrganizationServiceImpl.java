@@ -73,7 +73,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
     }
 
     @Override
-    public void createOrganization(CreateOrganizationRequest body, Long creator) {
+    public OrganizationModel createOrganization(CreateOrganizationRequest body, Long creator) {
         boolean existsByName = organizationRepository.existsByName(body.getName());
         if (existsByName) {
             throw new BadException("已经存在该组织名称");
@@ -84,7 +84,8 @@ public class OrganizationServiceImpl implements IOrganizationService {
                 .credential(body.getCredential())
                 .status(StatusEnum.WAIT_AUDIT)
                 .build();
-        organizationRepository.saveAndFlush(organization);
+        Organization doc = organizationRepository.saveAndFlush(organization);
+        return Mappers.getMapper(OrganizationMapper.class).toModel(doc);
     }
 
     @Override

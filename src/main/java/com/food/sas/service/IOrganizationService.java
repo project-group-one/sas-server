@@ -17,7 +17,7 @@ public interface IOrganizationService {
 
     Page<OrganizationModel> searchOrganization(String name, Pageable pageable);
 
-    void createOrganization(CreateOrganizationRequest dto, Long creator);
+    OrganizationModel createOrganization(CreateOrganizationRequest dto, Long creator);
 
     void modifyOrganization(CreateOrganizationRequest dto, Long id);
 
