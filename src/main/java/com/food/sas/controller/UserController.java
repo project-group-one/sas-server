@@ -229,7 +229,7 @@ public class UserController {
         userDTO.setPassword(password.substring(5));
         userDetailsService.addUserDetail(userDTO);
 
-        UserDetails userDetails = new User(userDTO.getUsername(), password, AuthorityUtils.createAuthorityList(userDTO.getRole()));
+        UserDetails userDetails = new User(userDTO.getUsername(), password.substring(5), AuthorityUtils.createAuthorityList(userDTO.getRole()));
         return Mono.just(Result.success(
                 JwtBody.newBuiler()
                         .setAccessToken(JwtHelper.encode(JSON.toJSONString(userDetails), SecurityConfiguration.HMAC).getEncoded())
