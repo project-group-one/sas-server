@@ -32,7 +32,7 @@ public interface IUserService {
 
     UserDTO searchUserById(Long id);
 
-    void thawUser(Long mId);
+    UserDTO thawUser(Long mId);
 
     List<UserDTO> getUsersHasNoOrg();
 

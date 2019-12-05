@@ -50,4 +50,7 @@ public class UserDTO implements Serializable {
 
     @ApiModelProperty("当前用户是否已审核")
     private boolean verified;
+
+    @ApiModelProperty("是否冻结")
+    private boolean locked;
 }

@@ -160,11 +160,12 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void thawUser(Long mId) {
-        userRepository.findById(mId).ifPresent(user -> {
-            user.setStatus(0);
-            userRepository.saveAndFlush(user);
-        });
+    public UserDTO thawUser(Long mId) {
+        Optional<User> optional = userRepository.findById(mId);
+        if (optional.isPresent()) {
+            return Mappers.getMapper(UserMapper.class).fromEntity(userRepository.saveAndFlush(optional.get()));
+        }
+        throw new RuntimeException("解冻用户失败");
     }
 
     @Override
