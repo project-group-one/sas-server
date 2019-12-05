@@ -9,6 +9,7 @@ import com.food.sas.data.entity.VerificationCode;
 import com.food.sas.data.response.Result;
 import com.food.sas.exception.BadException;
 import com.food.sas.security.SecurityConfiguration;
+import com.food.sas.security.jwt.JwtBody;
 import com.food.sas.security.service.MyMapReactiveUserDetailsService;
 import com.food.sas.service.IUserService;
 import com.food.sas.service.IVerificationCodeService;
@@ -34,6 +35,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -228,9 +230,13 @@ public class UserController {
         userDetailsService.addUserDetail(userDTO);
 
         UserDetails userDetails = new User(userDTO.getUsername(), password, AuthorityUtils.createAuthorityList(userDTO.getRole()));
-        Result<UserDTO> result = Result.success(userDTO);
-        result.setMsg(JwtHelper.encode(JSON.toJSONString(userDetails), SecurityConfiguration.HMAC).getEncoded());
-        return Mono.just(result);
+        return Mono.just(Result.success(
+                JwtBody.newBuiler()
+                        .setAccessToken(JwtHelper.encode(JSON.toJSONString(userDetails), SecurityConfiguration.HMAC).getEncoded())
+                        .setExpired(3600L + LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli())
+                        .setRefreshToken(null)
+                        .setUserId(userDTO.getId())
+                        .setUserType(userDTO.getType()).builde()));
     }
 
 
