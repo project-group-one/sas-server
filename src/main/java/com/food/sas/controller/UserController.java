@@ -94,8 +94,6 @@ public class UserController {
     public Mono<Result<UserDTO>> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
         if (authentication != null && authentication.isAuthenticated()) {
             UserDTO result = userService.findUserByUsername(authentication.getName());
-            result.setVerified((result.getStatus() & 8) == 8);
-            result.setLocked((result.getStatus() % 2) == 1);
             return Mono.just(Result.success(result));
         }
         exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
@@ -223,6 +221,7 @@ public class UserController {
         userDTO.setId(null);
         userDTO.setType(0);
         userDTO.setPassword(password);
+        userDTO.setVerifyStatus(0);
         userService.createUser(userDTO);
         verificationCode.setRegistered(1);
         verificationCodeService.saveOrUpdateVerificationCode(verificationCode);

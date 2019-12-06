@@ -188,6 +188,14 @@ public class UserServiceImpl implements IUserService {
             body.setStatus(entity.getStatus());
             body.setCreateTime(entity.getCreateTime());
         }
+
+        Optional<User> userOptional = userRepository.findById(body.getUserId());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setVerifyStatus(1);
+            userRepository.saveAndFlush(user);
+        }
+
         return userVerificationRepository.saveAndFlush(UserVerificationMapper.MAPPER.toEntity(body)).getId();
     }
 
