@@ -123,6 +123,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
         }
         Organization organization = organizationOptional.get();
         users.forEach(o -> o.setOrganization(organization));
+        organization.getUsers().clear();
         organization.getUsers().addAll(users);
         organizationRepository.save(organization);
     }
