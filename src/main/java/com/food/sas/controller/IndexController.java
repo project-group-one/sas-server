@@ -9,8 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class IndexController {
 
-    @GetMapping(value = "/index")
-    public String index() {
-        return "index";
+    @GetMapping(value = "/admin")
+    public String admin() {
+        return "admin/index";
+    }
+
+    @GetMapping(value = "/web")
+    public String web() {
+        return "web/index";
     }
 }

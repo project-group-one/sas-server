@@ -15,7 +15,7 @@ public class WebfluxConfig implements WebFluxConfigurer {
 
         registry.addResourceHandler("/swagger-ui.html**")
                 .addResourceLocations("classpath:/META-INF/resources/")
-                .addResourceLocations("classpath:/static/");
+                .addResourceLocations("classpath:/static/**");
 
     }
 }
