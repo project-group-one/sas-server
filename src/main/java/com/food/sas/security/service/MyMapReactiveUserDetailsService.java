@@ -99,7 +99,7 @@ public class MyMapReactiveUserDetailsService
 
     public void thaw(String username) {
         if (freezedUser.containsKey(username)) {
-            users.put(username, users.get(username));
+            users.put(username, freezedUser.get(username));
             freezedUser.remove(username);
         }
     }

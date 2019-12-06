@@ -73,7 +73,7 @@ public class TokenEndpoint {
             securityContext.setAuthentication(authentication1);
             if (securityContext.getAuthentication() == null) {
                 exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-                return Mono.just("用户名或者密码错误");
+                return Mono.just("用户名密码错误或者账号已被冻结");
             }
             repository.save(exchange, securityContext).then(Mono.empty())
                     .subscriberContext(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)))
