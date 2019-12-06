@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.food.sas.config.SmsSender;
 import com.food.sas.data.dto.UserDTO;
 import com.food.sas.data.dto.UserVerificationDTO;
-import com.food.sas.data.entity.UserVerification;
 import com.food.sas.data.entity.VerificationCode;
 import com.food.sas.data.response.Result;
 import com.food.sas.exception.BadException;
@@ -33,7 +32,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -139,9 +137,9 @@ public class UserController {
         if (!userService.validateById(id, mId)) {
             throw new BadException("no access");
         }
-        if (dto.getType() != null && !userService.validate(id, dto.getType())) {
+        /*if (dto.getType() != null && !userService.validate(id, dto.getType())) {
             throw new BadException("type is illegal");
-        }
+        }*/
         userService.modifyManager(dto, mId);
         return Mono.empty();
     }
