@@ -55,7 +55,7 @@ public class Organization implements Serializable {
     @CreatedBy
     private Long creator;
 
-    @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL)
     private Set<User> users = new LinkedHashSet<>();
 
 }
