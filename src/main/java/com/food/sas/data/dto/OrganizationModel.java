@@ -1,5 +1,6 @@
 package com.food.sas.data.dto;
 
+import com.food.sas.enums.StatusEnum;
 import lombok.Data;
 
 import java.util.Date;
@@ -13,6 +14,8 @@ public class OrganizationModel {
     private Long id;
 
     private String name;
+
+    private StatusEnum status;
 
     private Date createDate;
 

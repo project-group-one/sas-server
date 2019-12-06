@@ -123,6 +123,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
         }
         Organization organization = organizationOptional.get();
         users.forEach(o -> o.setOrganization(organization));
+        organization.getUsers().clear();
         organization.getUsers().addAll(users);
         organizationRepository.save(organization);
     }
@@ -134,7 +135,7 @@ public class OrganizationServiceImpl implements IOrganizationService {
             throw new BadException("该组织不存在");
         }
         Organization organization = organizationOptional.get();
-        if (organization.getStatus() == StatusEnum.AUDITING) {
+        if (organization.getStatus() != StatusEnum.WAIT_AUDIT) {
             throw new BadException("不在审核中不需要审核");
         }
         organization.setStatus(status);
