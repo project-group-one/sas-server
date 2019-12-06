@@ -12,6 +12,7 @@ import com.food.sas.mapper.UserMapper;
 import com.food.sas.mapper.UserVerificationMapper;
 import com.food.sas.service.IUserService;
 import com.food.sas.util.BooleanBuilderHelper;
+import com.google.common.collect.Lists;
 import com.querydsl.core.BooleanBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.factory.Mappers;
@@ -23,10 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -35,7 +33,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements IUserService {
 
-    private static final int FREEZED_STATUS = 1;
+    private static final int FREEZED_STATUS = 127;
 
     @Autowired
     private UserRepository userRepository;
@@ -136,7 +134,9 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void freezeUser(Long id) {
         userRepository.findById(id).ifPresent(user -> {
-            user.setStatus(FREEZED_STATUS);
+            if (user.getStatus() % 2 == 0) {
+                user.setStatus(user.getStatus() + 1);
+            }
             userRepository.saveAndFlush(user);
         });
     }
@@ -160,11 +160,14 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void thawUser(Long mId) {
-        userRepository.findById(mId).ifPresent(user -> {
-            user.setStatus(0);
-            userRepository.saveAndFlush(user);
-        });
+    public UserDTO thawUser(Long mId) {
+        Optional<User> optional = userRepository.findById(mId);
+        if (optional.isPresent()) {
+            User user = optional.get();
+            user.setStatus(user.getStatus() & (FREEZED_STATUS - 1));
+            return Mappers.getMapper(UserMapper.class).fromEntity(userRepository.saveAndFlush(optional.get()));
+        }
+        throw new RuntimeException("解冻用户失败");
     }
 
     @Override
@@ -183,7 +186,27 @@ public class UserServiceImpl implements IUserService {
             body.setStatus(entity.getStatus());
             body.setCreateTime(entity.getCreateTime());
         }
+
+        Optional<User> userOptional = userRepository.findById(body.getUserId());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setVerifyStatus(1);
+            userRepository.saveAndFlush(user);
+        }
+
         return userVerificationRepository.saveAndFlush(UserVerificationMapper.MAPPER.toEntity(body)).getId();
+    }
+
+    @Override
+    public List<String> getUserIdsByStatus(Integer status) {
+        QUser qUser = QUser.user;
+        BooleanBuilder builder = BooleanBuilderHelper.newBuilder().andIntegerEq(qUser.status, status).build();
+        Iterator<User> users = userRepository.findAll(builder).iterator();
+        List<String> result = Lists.newArrayList();
+        while (users.hasNext()) {
+            result.add(users.next().getUsername());
+        }
+        return result;
     }
 
 }

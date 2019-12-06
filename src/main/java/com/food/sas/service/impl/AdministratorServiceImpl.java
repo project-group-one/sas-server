@@ -59,7 +59,7 @@ public class AdministratorServiceImpl implements IAdministratorService {
             if (userOptional.isPresent()) {
                 entity.setStatus(1);
                 User user = userOptional.get();
-                user.setStatus(user.getStatus() | 8);
+                user.setVerifyStatus(2);
                 userVerificationRepository.saveAndFlush(entity).getUserId();
                 userRepository.saveAndFlush(user);
                 return Boolean.TRUE;

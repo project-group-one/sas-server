@@ -94,7 +94,6 @@ public class UserController {
     public Mono<Result<UserDTO>> getCurrentUser(Authentication authentication, ServerWebExchange exchange) {
         if (authentication != null && authentication.isAuthenticated()) {
             UserDTO result = userService.findUserByUsername(authentication.getName());
-            result.setVerified((result.getStatus() & 8) == result.getStatus());
             return Mono.just(Result.success(result));
         }
         exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
@@ -164,8 +163,8 @@ public class UserController {
     @ApiOperation("解冻用户")
     @PostMapping("/{mId}/thaw")
     public Mono<?> thawUser(@ApiParam("需要解冻的用户id") @PathVariable Long mId) {
-        userService.thawUser(mId);
-        return Mono.empty();
+        userDetailsService.thaw(userService.thawUser(mId).getUsername());
+        return Mono.just(Result.success());
     }
 
 
@@ -222,6 +221,7 @@ public class UserController {
         userDTO.setId(null);
         userDTO.setType(0);
         userDTO.setPassword(password);
+        userDTO.setVerifyStatus(0);
         userService.createUser(userDTO);
         verificationCode.setRegistered(1);
         verificationCodeService.saveOrUpdateVerificationCode(verificationCode);
@@ -275,7 +275,7 @@ public class UserController {
             if (b) {
                 user.setPassword(SALT + encoder.encode(nPwd));
                 userService.createUser(user);
-                Result.success(userDetailsService.updatePassword(new com.food.sas.security.User(user.getId(), user.getType(), user.getUsername(), user.getPassword().substring(5), AuthorityUtils.createAuthorityList(user.getRole().split(","))), user.getPassword().substring(5)));
+                return Result.success(userDetailsService.updatePassword(new com.food.sas.security.User(user.getId(), user.getType(), user.getUsername(), user.getPassword().substring(5), AuthorityUtils.createAuthorityList(user.getRole().split(","))), user.getPassword().substring(5)));
             }
         }
         return Result.fail("修改密码失败");

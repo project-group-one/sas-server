@@ -2,6 +2,7 @@ package com.food.sas.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -49,5 +50,8 @@ public class User implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private Organization organization;
+
+    @ColumnDefault("0")
+    private Integer verifyStatus;
 
 }
