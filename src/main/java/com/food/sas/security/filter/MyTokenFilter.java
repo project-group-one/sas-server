@@ -55,7 +55,7 @@ public class MyTokenFilter implements WebFilter {
                 UserDetails userDetails = JSON.parseObject(json, User.class);
 
                 final Mono<Authentication> authentication = userDetailsService.findByUsername(userDetails.getUsername()).filter(u -> u.getPassword().equals(userDetails.getPassword()))
-                        .switchIfEmpty(Mono.defer(() -> Mono.error(new BadException("Invalid Credentials"))))
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new BadException("TOKEN账号或密码错误"))))
                         .map(u -> new UsernamePasswordAuthenticationToken(u, u.getPassword(), u.getAuthorities()));
 //
 //                SecurityContextImpl securityContext = new SecurityContextImpl();
