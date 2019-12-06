@@ -37,4 +37,6 @@ public interface IUserService {
     List<UserDTO> getUsersHasNoOrg();
 
     Integer saveUserVerification(UserVerificationDTO body);
+
+    List<String> getUserIdsByStatus(Integer status);
 }

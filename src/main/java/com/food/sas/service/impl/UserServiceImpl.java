@@ -12,6 +12,7 @@ import com.food.sas.mapper.UserMapper;
 import com.food.sas.mapper.UserVerificationMapper;
 import com.food.sas.service.IUserService;
 import com.food.sas.util.BooleanBuilderHelper;
+import com.google.common.collect.Lists;
 import com.querydsl.core.BooleanBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.factory.Mappers;
@@ -23,10 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -197,6 +195,18 @@ public class UserServiceImpl implements IUserService {
         }
 
         return userVerificationRepository.saveAndFlush(UserVerificationMapper.MAPPER.toEntity(body)).getId();
+    }
+
+    @Override
+    public List<String> getUserIdsByStatus(Integer status) {
+        QUser qUser = QUser.user;
+        BooleanBuilder builder = BooleanBuilderHelper.newBuilder().andIntegerEq(qUser.status, status).build();
+        Iterator<User> users = userRepository.findAll(builder).iterator();
+        List<String> result = Lists.newArrayList();
+        while (users.hasNext()) {
+            result.add(users.next().getUsername());
+        }
+        return result;
     }
 
 }
