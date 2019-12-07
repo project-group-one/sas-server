@@ -14,6 +14,7 @@ import com.food.sas.service.IUserService;
 import com.food.sas.util.BooleanBuilderHelper;
 import com.google.common.collect.Lists;
 import com.querydsl.core.BooleanBuilder;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,14 +121,8 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public void batchDeleteUser(Long[] ids) {
-        if (ids != null && ids.length > 1) {
-            List<User> list = new ArrayList<>(ids.length);
-            for (Long id : ids) {
-                User user = new User();
-                user.setId(id);
-                list.add(user);
-            }
-            userRepository.deleteAll(list);
+        if (ArrayUtils.isNotEmpty(ids)) {
+            userRepository.deleteByIdIn(Arrays.asList(ids));
         }
     }
 

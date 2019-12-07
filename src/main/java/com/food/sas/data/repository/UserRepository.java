@@ -10,4 +10,6 @@ import java.util.List;
 public interface UserRepository extends MyRepository<User, Long> {
 
     List<User> findByIdIn(List<Long> ids);
+
+    void deleteByIdIn(List<Long> ids);
 }

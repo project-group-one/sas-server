@@ -63,17 +63,17 @@ public class FocalPictureServiceImpl implements IFocalPictureService {
             if (StringUtils.isNotEmpty(dto.getImgUrl())) {
                 focalPicture.setImgUrl(dto.getImgUrl());
             }
-
             if (dto.getHidden() != null) {
                 focalPicture.setHidden(dto.getHidden());
             }
-
             if (dto.getOrdered() != null) {
                 focalPicture.setOrdered(dto.getOrdered());
             }
-
             if (StringUtils.isNotEmpty(dto.getName())) {
                 focalPicture.setName(dto.getName());
+            }
+            if(StringUtils.isNotEmpty(dto.getUrl())){
+                focalPicture.setUrl(dto.getUrl());
             }
             focalPictureRepository.saveAndFlush(focalPicture);
         });

@@ -48,7 +48,6 @@ public class FocalPictureController {
     @ApiOperation("新增焦点图")
     @PostMapping
     public Mono<Void> createFocalPicture(@RequestBody FocalPictureDTO body, Authentication authentication) {
-        System.out.println(((UserDetails) authentication.getPrincipal()).getUsername());
         body.setCreator(userService.findUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername()).getId());
         service.createFocalPicture(body);
         return Mono.empty();
