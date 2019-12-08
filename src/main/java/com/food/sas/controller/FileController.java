@@ -45,7 +45,6 @@ public class FileController {
 
     private final FileInfoRepository fileRepository;
     private final FastFileStorageClient fastFileStorageClient;
-    private static final String GROUP = "normal-file";
 
     @ApiOperation("上传文件")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

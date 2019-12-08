@@ -8,6 +8,7 @@ import com.food.sas.service.IUserService;
 import com.github.tobato.fastdfs.domain.fdfs.StorePath;
 import com.github.tobato.fastdfs.domain.proto.storage.DownloadByteArray;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
+import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,8 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Created by ygdxd_admin at 2018-12-22 2:41 PM
@@ -38,14 +40,14 @@ public class NewsController {
     private final INewsService newsService;
     private final IUserService userService;
     private final FastFileStorageClient fastFileStorageClient;
-    private static final String GROUP = "news";
 
     @ApiOperation("获得单个新闻内容")
     @GetMapping("/{id}")
     public Result<NewsDTO> getNewsById(@PathVariable Long id) {
         NewsDTO dto = newsService.getNewsById(id);
         if (dto.getStoreUrl() != null) {
-            byte[] bytes = fastFileStorageClient.downloadFile(GROUP, dto.getStoreUrl(), new DownloadByteArray());
+            StorePath storePath = StorePath.parseFromUrl(dto.getStoreUrl());
+            byte[] bytes = fastFileStorageClient.downloadFile(storePath.getGroup(), storePath.getPath(), new DownloadByteArray());
             dto.setContent(new String(bytes));
         }
         return Result.success(dto);
@@ -66,7 +68,7 @@ public class NewsController {
         Path data = FileSystems.getDefault().getPath("/data", UUID.randomUUID().toString() + ".md");
         Files.write(data, body.getContent().getBytes());
         File file = data.toFile();
-        StorePath storePath = fastFileStorageClient.uploadFile(GROUP, new FileInputStream(file), file.length(), ".md");
+        StorePath storePath = fastFileStorageClient.uploadFile(new FileInputStream(file), file.length(), "md", Sets.newHashSet());
         body.setStoreUrl(storePath.getFullPath());
         newsService.saveNews(body);
         Files.deleteIfExists(data);
@@ -79,7 +81,7 @@ public class NewsController {
         Path old = Paths.get(body.getStoreUrl());
         Files.write(old, body.getContent().getBytes());
         File file = old.toFile();
-        StorePath storePath = fastFileStorageClient.uploadFile(GROUP, new FileInputStream(file), file.length(), ".md");
+        StorePath storePath = fastFileStorageClient.uploadFile(new FileInputStream(file), file.length(), "md", Sets.newHashSet());
         body.setStoreUrl(storePath.getFullPath());
         newsService.saveNews(body);
         Files.deleteIfExists(old);
@@ -91,7 +93,7 @@ public class NewsController {
     public Mono<Void> deleteNews(@PathVariable Long id) {
         NewsDTO dto = newsService.getNewsById(id);
         if (dto.getStoreUrl() != null) {
-            fastFileStorageClient.deleteFile(GROUP, dto.getStoreUrl());
+            fastFileStorageClient.deleteFile(dto.getStoreUrl());
         }
         newsService.deleteNews(id);
         return Mono.empty();
