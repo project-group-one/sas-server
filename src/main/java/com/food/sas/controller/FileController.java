@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -75,7 +74,8 @@ public class FileController {
         }
         StorePath storePath = StorePath.parseFromUrl(fileInfo.getPrefix() + fileInfo.getPath());
         String extension = FilenameUtils.getExtension(fileInfo.getName());
-        Path newPath = FileSystems.getDefault().getPath("/file", UUID.randomUUID().toString() + "." + extension);
+        File classPath = new File(ResourceUtils.getURL("classpath:static").getPath());
+        Path newPath = Files.createFile(Paths.get(classPath.getAbsolutePath() + "/" + UUID.randomUUID().toString() + "." + extension));
         byte[] bytes = fastFileStorageClient.downloadFile(storePath.getGroup(), storePath.getPath(), new DownloadByteArray());
         Files.write(newPath, bytes);
         ZeroCopyHttpOutputMessage zeroCopyResponse = (ZeroCopyHttpOutputMessage) response;
