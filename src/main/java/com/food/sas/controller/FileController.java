@@ -62,6 +62,7 @@ public class FileController {
         String name = FilenameUtils.getName(fullPath);
         String prefix = fullPath.replace(name, "");
         fileRepository.save(FileInfo.builder().name(filePart.filename()).path(name).prefix(prefix).build());
+        Files.deleteIfExists(newPath);
         return Result.success(name);
     }
 
