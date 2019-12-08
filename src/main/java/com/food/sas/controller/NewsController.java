@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,13 +77,13 @@ public class NewsController {
     @ApiOperation("修改新闻内容")
     @PutMapping("/{id}")
     public Mono<Void> updateNews(@RequestBody NewsDTO body, @PathVariable Long id) throws IOException {
-        Path old = Paths.get(body.getStoreUrl());
-        Files.write(old, body.getContent().getBytes());
-        File file = old.toFile();
+        Path data = FileSystems.getDefault().getPath("/data", UUID.randomUUID().toString() + ".md");
+        Files.write(data, body.getContent().getBytes());
+        File file = data.toFile();
         StorePath storePath = fastFileStorageClient.uploadFile(new FileInputStream(file), file.length(), "md", Sets.newHashSet());
         body.setStoreUrl(storePath.getFullPath());
         newsService.saveNews(body);
-        Files.deleteIfExists(old);
+        Files.deleteIfExists(data);
         return Mono.empty();
     }
 
