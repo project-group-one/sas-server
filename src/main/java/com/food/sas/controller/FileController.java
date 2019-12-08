@@ -59,7 +59,7 @@ public class FileController {
         Path newPath = Files.createFile(Paths.get(path + "/" + UUID.randomUUID().toString() + "." + extension));
         filePart.transferTo(newPath);
         File file = newPath.toFile();
-        StorePath storePath = fastFileStorageClient.uploadFile(new FileInputStream(file), file.length(), FilenameUtils.getExtension(extension), Sets.newHashSet());
+        StorePath storePath = fastFileStorageClient.uploadFile(new FileInputStream(file), file.length(), extension, Sets.newHashSet());
         String url = storePath.getPath();
         fileRepository.save(FileInfo.builder().name(filePart.filename()).path(url).prefix(storePath.getGroup()).build());
         return Result.success(url);
