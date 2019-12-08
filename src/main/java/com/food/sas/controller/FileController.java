@@ -52,6 +52,9 @@ public class FileController {
     public Result<String> uploadFile(@RequestPart("file") FilePart filePart) throws IOException {
         String extension = FilenameUtils.getExtension(filePart.filename());
         Path newPath = FileSystems.getDefault().getPath("/file", UUID.randomUUID().toString() + extension);
+        if (!newPath.toFile().exists()) {
+            Files.createFile(newPath);
+        }
         filePart.transferTo(newPath);
         File file = newPath.toFile();
         StorePath storePath = fastFileStorageClient.uploadFile(GROUP, new FileInputStream(file), file.length(), FilenameUtils.getExtension(extension));
