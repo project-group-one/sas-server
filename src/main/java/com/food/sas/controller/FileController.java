@@ -18,7 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ZeroCopyHttpOutputMessage;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.util.ResourceUtils;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -26,9 +26,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -49,20 +46,14 @@ public class FileController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<String> uploadFile(@RequestPart("file") FilePart filePart) throws IOException {
         String extension = FilenameUtils.getExtension(filePart.filename());
-        File classPath = new File(ResourceUtils.getURL("classpath:static").getPath());
-        Path path = Paths.get(classPath.getAbsolutePath() + "/upload/");
-        if (!Files.exists(path)) {
-            Files.createDirectories(path);
-        }
-        Path newPath = Files.createFile(Paths.get(path + "/" + UUID.randomUUID().toString() + "." + extension));
-        filePart.transferTo(newPath);
-        File file = newPath.toFile();
-        StorePath storePath = fastFileStorageClient.uploadFile(new FileInputStream(file), file.length(), extension, Sets.newHashSet());
+        File newFile = File.createTempFile(UUID.randomUUID().toString(), "." + extension);
+        filePart.transferTo(newFile);
+        StorePath storePath = fastFileStorageClient.uploadFile(new FileInputStream(newFile), newFile.length(), extension, Sets.newHashSet());
         String fullPath = storePath.getFullPath();
         String name = FilenameUtils.getName(fullPath);
         String prefix = fullPath.replace(name, "");
         fileRepository.save(FileInfo.builder().name(filePart.filename()).path(name).prefix(prefix).build());
-        Files.deleteIfExists(newPath);
+        newFile.deleteOnExit();
         return Result.success(name);
     }
 
@@ -74,14 +65,13 @@ public class FileController {
             throw new BadException("文件不存在");
         }
         StorePath storePath = StorePath.parseFromUrl(fileInfo.getPrefix() + fileInfo.getPath());
-        String extension = FilenameUtils.getExtension(fileInfo.getName());
-        File classPath = new File(ResourceUtils.getURL("classpath:static").getPath());
-        Path newPath = Files.createFile(Paths.get(classPath.getAbsolutePath() + "/" + UUID.randomUUID().toString() + "." + extension));
         byte[] bytes = fastFileStorageClient.downloadFile(storePath.getGroup(), storePath.getPath(), new DownloadByteArray());
-        Files.write(newPath, bytes);
+        String extension = FilenameUtils.getExtension(path);
+        File temp = File.createTempFile(UUID.randomUUID().toString(), "." + extension);
+        FileCopyUtils.copy(bytes, temp);
         ZeroCopyHttpOutputMessage zeroCopyResponse = (ZeroCopyHttpOutputMessage) response;
         response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(fileInfo.getName(), "UTF-8"));
         response.getHeaders().setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        return zeroCopyResponse.writeWith(newPath, 0, newPath.toFile().length());
+        return zeroCopyResponse.writeWith(temp, 0, temp.length());
     }
 }
