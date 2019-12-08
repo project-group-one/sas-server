@@ -8,13 +8,11 @@ import com.food.sas.data.repository.FoodTypeRepository;
 import com.food.sas.mapper.FoodTypeMapper;
 import com.food.sas.util.TreeHelper;
 import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.mapstruct.factory.Mappers;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +20,7 @@ import java.util.Optional;
  * Created by zj on 2019/1/5
  */
 @Service
-@Log4j2
+@Slf4j
 @AllArgsConstructor
 public class FoodTypeService {
 
