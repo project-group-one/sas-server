@@ -128,7 +128,7 @@ public class UserController {
         return Mono.empty();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CLIENT')")
     @ApiOperation("修改用户")
     @PutMapping("/{mId}")
     public Mono<Void> modifyManager(@RequestBody UserDTO dto,
