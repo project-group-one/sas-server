@@ -61,7 +61,7 @@ public class FileController {
         StorePath storePath = fastFileStorageClient.uploadFile(new FileInputStream(file), file.length(), extension, Sets.newHashSet());
         String fullPath = storePath.getFullPath();
         String name = FilenameUtils.getName(fullPath);
-        String prefix = file.toString().replace(name, "");
+        String prefix = fullPath.replace(name, "");
         fileRepository.save(FileInfo.builder().name(filePart.filename()).path(name).prefix(prefix).build());
         return Result.success(name);
     }
@@ -73,7 +73,7 @@ public class FileController {
         if (Objects.isNull(fileInfo)) {
             throw new BadException("文件不存在");
         }
-        StorePath storePath = StorePath.parseFromUrl(path);
+        StorePath storePath = StorePath.parseFromUrl(fileInfo.getPrefix() + fileInfo.getPath());
         String extension = FilenameUtils.getExtension(fileInfo.getName());
         Path newPath = FileSystems.getDefault().getPath("/file", UUID.randomUUID().toString() + "." + extension);
         byte[] bytes = fastFileStorageClient.downloadFile(storePath.getGroup(), storePath.getPath(), new DownloadByteArray());

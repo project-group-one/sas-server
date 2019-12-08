@@ -1,5 +1,7 @@
 package com.food.sas.controller;
 
+import com.food.sas.data.entity.FileInfo;
+import com.food.sas.data.repository.FileInfoRepository;
 import com.github.tobato.fastdfs.domain.fdfs.StorePath;
 import com.github.tobato.fastdfs.domain.proto.storage.DownloadByteArray;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
@@ -23,13 +25,15 @@ import java.util.List;
 public class FilePreViewController {
 
     private final FastFileStorageClient fastFileStorageClient;
+    private final FileInfoRepository fileInfoRepository;
 
     @GetMapping("/uploads/{path}")
     public ByteArrayResource filePreView(@PathVariable("path") String path, ServerHttpResponse response) {
+        FileInfo fileInfo = fileInfoRepository.findByPath(path);
         String extension = FilenameUtils.getExtension(path);
         List<String> images = Arrays.asList("jpg", "png", "jpeg");
         if (!images.contains(extension)) return new ByteArrayResource(new byte[]{});
-        StorePath storePath = StorePath.parseFromUrl(path);
+        StorePath storePath = StorePath.parseFromUrl(fileInfo.getPrefix() + fileInfo.getPath());
         byte[] bytes = fastFileStorageClient.downloadFile(storePath.getGroup(), storePath.getPath(), new DownloadByteArray());
         response.getHeaders().setContentType(MediaType.IMAGE_PNG);
         return new ByteArrayResource(bytes);
