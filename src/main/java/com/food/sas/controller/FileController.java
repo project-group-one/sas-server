@@ -4,7 +4,6 @@ import com.food.sas.data.entity.FileInfo;
 import com.food.sas.data.repository.FileInfoRepository;
 import com.food.sas.data.response.Result;
 import com.food.sas.exception.BadException;
-import com.github.tobato.fastdfs.domain.fdfs.MetaData;
 import com.github.tobato.fastdfs.domain.fdfs.StorePath;
 import com.github.tobato.fastdfs.domain.proto.storage.DownloadByteArray;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
@@ -22,15 +21,15 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -51,10 +50,12 @@ public class FileController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<String> uploadFile(@RequestPart("file") FilePart filePart) throws IOException {
         String extension = FilenameUtils.getExtension(filePart.filename());
-        Path newPath = FileSystems.getDefault().getPath("/file", UUID.randomUUID().toString() + extension);
-        if (!newPath.toFile().exists()) {
-            Files.createFile(newPath);
+        File classPath = new File(ResourceUtils.getURL("classpath:static").getPath());
+        Path path = Paths.get(classPath.getAbsolutePath() + "/upload/");
+        if (!Files.exists(path)) {
+            Files.createDirectories(path);
         }
+        Path newPath = Files.createFile(Paths.get(path + "/" + UUID.randomUUID().toString() + "." + extension));
         filePart.transferTo(newPath);
         File file = newPath.toFile();
         StorePath storePath = fastFileStorageClient.uploadFile(GROUP, new FileInputStream(file), file.length(), FilenameUtils.getExtension(extension));
