@@ -59,9 +59,11 @@ public class FileController {
         filePart.transferTo(newPath);
         File file = newPath.toFile();
         StorePath storePath = fastFileStorageClient.uploadFile(new FileInputStream(file), file.length(), extension, Sets.newHashSet());
-        String url = storePath.getFullPath();
-        fileRepository.save(FileInfo.builder().name(filePart.filename()).path(url).prefix(storePath.getGroup()).build());
-        return Result.success(url);
+        String fullPath = storePath.getFullPath();
+        String name = FilenameUtils.getName(fullPath);
+        String prefix = file.toString().replace(name, "");
+        fileRepository.save(FileInfo.builder().name(filePart.filename()).path(name).prefix(prefix).build());
+        return Result.success(name);
     }
 
     @ApiOperation("下载文件")
