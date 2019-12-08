@@ -59,7 +59,7 @@ public class FileController {
         filePart.transferTo(newPath);
         File file = newPath.toFile();
         StorePath storePath = fastFileStorageClient.uploadFile(new FileInputStream(file), file.length(), extension, Sets.newHashSet());
-        String url = storePath.getPath();
+        String url = storePath.getFullPath();
         fileRepository.save(FileInfo.builder().name(filePart.filename()).path(url).prefix(storePath.getGroup()).build());
         return Result.success(url);
     }
@@ -71,9 +71,10 @@ public class FileController {
         if (Objects.isNull(fileInfo)) {
             throw new BadException("文件不存在");
         }
+        StorePath storePath = StorePath.parseFromUrl(path);
         String extension = FilenameUtils.getExtension(fileInfo.getName());
-        Path newPath = FileSystems.getDefault().getPath("/file", UUID.randomUUID().toString() + extension);
-        byte[] bytes = fastFileStorageClient.downloadFile(fileInfo.getPrefix(), fileInfo.getPath(), new DownloadByteArray());
+        Path newPath = FileSystems.getDefault().getPath("/file", UUID.randomUUID().toString() + "." + extension);
+        byte[] bytes = fastFileStorageClient.downloadFile(storePath.getGroup(), storePath.getPath(), new DownloadByteArray());
         Files.write(newPath, bytes);
         ZeroCopyHttpOutputMessage zeroCopyResponse = (ZeroCopyHttpOutputMessage) response;
         response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(fileInfo.getName(), "UTF-8"));
