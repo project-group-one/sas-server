@@ -49,6 +49,14 @@ sms.SignName: 安全抽检
 sms.accessKeyId: LTAIxGYss93KmEQM
 sms.accessSecret: tcyo7lOD4WuM7DJrqgTOshhfHwZNLd
 
-
-
-
+fdfs:
+  connect-timeout: 1000
+  so-timeout: 3000
+  thumb-image:
+    height: 200
+    width: 200
+  tracker-list: 172.17.60.213:22122
+  pool:
+    jmx-enabled: false
+    test-on-borrow: false
+    test-on-return: false

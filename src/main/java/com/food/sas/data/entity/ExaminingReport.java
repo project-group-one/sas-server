@@ -23,7 +23,7 @@ import java.util.Date;
 public class ExaminingReport implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -51,5 +51,6 @@ public class ExaminingReport implements Serializable {
     @CreatedDate
     private Date createdDate;
 
+    private Long orgId;
 
 }

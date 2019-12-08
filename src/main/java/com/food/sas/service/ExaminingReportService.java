@@ -36,9 +36,10 @@ public class ExaminingReportService {
     private FileInfoRepository fileInfoRepository;
     private ExaminingReportRepository examiningReportRepository;
 
-    public Page<ExaminingReport> listExaminingReports(String name, int page, int size) {
+    public Page<ExaminingReport> listExaminingReports(Long orgId, String name, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page - 1, size);
         BooleanBuilder builder = new BooleanBuilder();
+        builder.and(QExaminingReport.examiningReport.orgId.eq(orgId));
         if (!StringUtils.isEmpty(name)) {
             builder.and(QExaminingReport.examiningReport.name.contains(name));
         }

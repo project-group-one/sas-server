@@ -5,6 +5,9 @@ import com.food.sas.data.dto.NewsDTO;
 import com.food.sas.data.response.Result;
 import com.food.sas.service.INewsService;
 import com.food.sas.service.IUserService;
+import com.github.tobato.fastdfs.domain.fdfs.StorePath;
+import com.github.tobato.fastdfs.domain.proto.storage.DownloadByteArray;
+import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -14,13 +17,14 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Created by ygdxd_admin at 2018-12-22 2:41 PM
@@ -31,20 +35,18 @@ import java.util.UUID;
 @AllArgsConstructor
 public class NewsController {
 
-    private INewsService newsService;
-
-    private IUserService userService;
+    private final INewsService newsService;
+    private final IUserService userService;
+    private final FastFileStorageClient fastFileStorageClient;
+    private static final String GROUP = "news";
 
     @ApiOperation("获得单个新闻内容")
     @GetMapping("/{id}")
-    public Result<NewsDTO> getNewsById(@PathVariable Long id) throws IOException {
+    public Result<NewsDTO> getNewsById(@PathVariable Long id) {
         NewsDTO dto = newsService.getNewsById(id);
         if (dto.getStoreUrl() != null) {
-            Path path = Paths.get(dto.getStoreUrl());
-            if (Files.exists(path)) {
-                byte[] data = Files.readAllBytes(path);
-                dto.setContent(new String(data));
-            }
+            byte[] bytes = fastFileStorageClient.downloadFile(GROUP, dto.getStoreUrl(), new DownloadByteArray());
+            dto.setContent(new String(bytes));
         }
         return Result.success(dto);
     }
@@ -62,10 +64,12 @@ public class NewsController {
     @PostMapping
     public Mono<Void> releaseNews(@RequestBody NewsDTO body) throws IOException {
         Path data = FileSystems.getDefault().getPath("/data", UUID.randomUUID().toString() + ".md");
-        Files.createFile(data);
         Files.write(data, body.getContent().getBytes());
-        body.setStoreUrl(data.toAbsolutePath().toString());
+        File file = data.toFile();
+        StorePath storePath = fastFileStorageClient.uploadFile(GROUP, new FileInputStream(file), file.length(), ".md");
+        body.setStoreUrl(storePath.getFullPath());
         newsService.saveNews(body);
+        Files.deleteIfExists(data);
         return Mono.empty();
     }
 
@@ -74,19 +78,20 @@ public class NewsController {
     public Mono<Void> updateNews(@RequestBody NewsDTO body, @PathVariable Long id) throws IOException {
         Path old = Paths.get(body.getStoreUrl());
         Files.write(old, body.getContent().getBytes());
+        File file = old.toFile();
+        StorePath storePath = fastFileStorageClient.uploadFile(GROUP, new FileInputStream(file), file.length(), ".md");
+        body.setStoreUrl(storePath.getFullPath());
         newsService.saveNews(body);
+        Files.deleteIfExists(old);
         return Mono.empty();
     }
 
     @ApiOperation("删除新闻")
     @DeleteMapping("/{id}")
-    public Mono<Void> deleteNews(@PathVariable Long id) throws IOException {
+    public Mono<Void> deleteNews(@PathVariable Long id) {
         NewsDTO dto = newsService.getNewsById(id);
         if (dto.getStoreUrl() != null) {
-            Path deleteFile = Paths.get(dto.getStoreUrl());
-            if (Files.exists(deleteFile)) {
-                Files.deleteIfExists(deleteFile);
-            }
+            fastFileStorageClient.deleteFile(GROUP, dto.getStoreUrl());
         }
         newsService.deleteNews(id);
         return Mono.empty();

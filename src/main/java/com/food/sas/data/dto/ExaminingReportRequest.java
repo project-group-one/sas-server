@@ -30,4 +30,6 @@ public class ExaminingReportRequest {
     @ApiModelProperty("指标")
     private String indicator;
 
+    private Long orgId;
+
 }

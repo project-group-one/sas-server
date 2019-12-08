@@ -3,6 +3,7 @@ package com.food.sas.controller;
 import com.food.sas.data.dto.DetectionResultModel;
 import com.food.sas.data.dto.ExaminingReportRequest;
 import com.food.sas.data.entity.ExaminingReport;
+import com.food.sas.data.entity.User;
 import com.food.sas.data.response.Result;
 import com.food.sas.service.ExaminingReportService;
 import io.swagger.annotations.Api;
@@ -10,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,8 +33,9 @@ public class ExaminingReportController {
     @GetMapping
     public Result<List<ExaminingReport>> listExaminingReports(@RequestParam(value = "name", required = false) String name,
                                                               @RequestParam(value = "current", defaultValue = "1") int page,
-                                                              @RequestParam(value = "pageSize", defaultValue = "20") int size) {
-        Page<ExaminingReport> reportPage = examiningReportService.listExaminingReports(name, page, size);
+                                                              @RequestParam(value = "pageSize", defaultValue = "20") int size,
+                                                              @RequestParam(value = "orgId") Long orgId) {
+        Page<ExaminingReport> reportPage = examiningReportService.listExaminingReports(orgId, name, page, size);
         return Result.success(reportPage.getContent(), reportPage);
     }
 

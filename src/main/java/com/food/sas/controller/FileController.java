@@ -3,12 +3,16 @@ package com.food.sas.controller;
 import com.food.sas.data.entity.FileInfo;
 import com.food.sas.data.repository.FileInfoRepository;
 import com.food.sas.data.response.Result;
+import com.food.sas.exception.BadException;
+import com.github.tobato.fastdfs.domain.fdfs.MetaData;
+import com.github.tobato.fastdfs.domain.fdfs.StorePath;
+import com.github.tobato.fastdfs.domain.proto.storage.DownloadByteArray;
+import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ZeroCopyHttpOutputMessage;
@@ -18,15 +22,15 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
-import java.nio.channels.AsynchronousFileChannel;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -39,37 +43,37 @@ import java.util.UUID;
 @AllArgsConstructor
 public class FileController {
 
-    private FileInfoRepository fileRepository;
+    private final FileInfoRepository fileRepository;
+    private final FastFileStorageClient fastFileStorageClient;
+    private static final String GROUP = "normal-file";
 
     @ApiOperation("上传文件")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<String> uploadFile(@RequestPart("file") FilePart filePart) throws IOException {
         String extension = FilenameUtils.getExtension(filePart.filename());
-        File classPath = new File(ResourceUtils.getURL("classpath:static").getPath());
-
-        Path path = Paths.get(classPath.getAbsolutePath() + "/upload/");
-        if (!Files.exists(path)) {
-            Files.createDirectories(path);
-        }
-        Path file = Files.createFile(Paths.get(path + "/" + UUID.randomUUID().toString() + "." + extension));
-
-        log.info(file.toString());
-        AsynchronousFileChannel channel = AsynchronousFileChannel.open(file, StandardOpenOption.WRITE);
-        DataBufferUtils.write(filePart.content(), channel, 0).subscribe();
-        String url = file.getFileName().toString();
-        String prefix = file.toString().replace(url, "");
-        fileRepository.save(FileInfo.builder().name(filePart.filename()).path(url).prefix(prefix).build());
+        Path newPath = FileSystems.getDefault().getPath("/file", UUID.randomUUID().toString() + extension);
+        filePart.transferTo(newPath);
+        File file = newPath.toFile();
+        StorePath storePath = fastFileStorageClient.uploadFile(GROUP, new FileInputStream(file), file.length(), FilenameUtils.getExtension(extension));
+        String url = storePath.getPath();
+        fileRepository.save(FileInfo.builder().name(filePart.filename()).path(url).prefix(storePath.getGroup()).build());
         return Result.success(url);
     }
 
     @ApiOperation("下载文件")
     @GetMapping
-    public Mono<Void> download(@RequestParam("path") String path, ServerHttpResponse response) throws UnsupportedEncodingException {
-        ZeroCopyHttpOutputMessage zeroCopyResponse = (ZeroCopyHttpOutputMessage) response;
+    public Mono<Void> download(@RequestParam("path") String path, ServerHttpResponse response) throws IOException {
         FileInfo fileInfo = fileRepository.findByPath(path);
-        File file = Paths.get(fileInfo.getPrefix() + path).toFile();
+        if (Objects.isNull(fileInfo)) {
+            throw new BadException("文件不存在");
+        }
+        String extension = FilenameUtils.getExtension(fileInfo.getName());
+        Path newPath = FileSystems.getDefault().getPath("/file", UUID.randomUUID().toString() + extension);
+        byte[] bytes = fastFileStorageClient.downloadFile(fileInfo.getPrefix(), fileInfo.getPath(), new DownloadByteArray());
+        Files.write(newPath, bytes);
+        ZeroCopyHttpOutputMessage zeroCopyResponse = (ZeroCopyHttpOutputMessage) response;
         response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(fileInfo.getName(), "UTF-8"));
         response.getHeaders().setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        return zeroCopyResponse.writeWith(file, 0, file.length());
+        return zeroCopyResponse.writeWith(newPath, 0, newPath.toFile().length());
     }
 }
